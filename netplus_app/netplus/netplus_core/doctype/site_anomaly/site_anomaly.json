@@ -1,0 +1,174 @@
+{
+ "actions": [],
+ "autoname": "format:ANOM-{YYYY}-{#####}",
+ "creation": "2026-08-15 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "site",
+  "task",
+  "anomaly_type",
+  "severity",
+  "status",
+  "column_break_1",
+  "reported_by",
+  "employee",
+  "supervisor",
+  "reported_on",
+  "section_details",
+  "description",
+  "section_gps",
+  "latitude",
+  "longitude",
+  "gps_accuracy"
+ ],
+ "fields": [
+  {
+   "fieldname": "site",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Site",
+   "options": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "label": "Mission",
+   "options": "Task"
+  },
+  {
+   "fieldname": "anomaly_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Type d'anomalie",
+   "options": "Acc\u00e8s bloqu\u00e9\nD\u00e9g\u00e2t des eaux\nMat\u00e9riel manquant\nProbl\u00e8me \u00e9lectrique\nInfestation\nBris d'\u00e9quipement\nAutre",
+   "reqd": 1
+  },
+  {
+   "fieldname": "severity",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Gravit\u00e9",
+   "options": "Mineure\nMajeure\nCritique",
+   "reqd": 1
+  },
+  {
+   "default": "Ouverte",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Statut",
+   "options": "Ouverte\nEn cours\nR\u00e9solue"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reported_by",
+   "fieldtype": "Link",
+   "label": "Signal\u00e9 par",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employ\u00e9",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supervisor",
+   "fieldtype": "Link",
+   "label": "Superviseur notifi\u00e9",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reported_on",
+   "fieldtype": "Datetime",
+   "label": "Signal\u00e9 le",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_details",
+   "fieldtype": "Section Break",
+   "label": "D\u00e9tails"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "section_gps",
+   "fieldtype": "Section Break",
+   "label": "Position GPS"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Float",
+   "label": "Latitude",
+   "precision": "7",
+   "read_only": 1
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Float",
+   "label": "Longitude",
+   "precision": "7",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gps_accuracy",
+   "fieldtype": "Float",
+   "label": "Pr\u00e9cision GPS (m)",
+   "precision": "1",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-15 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Site Anomaly",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "read": 1,
+   "role": "NetPlus Operator",
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "role": "NetPlus Supervisor",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,383 @@
+[
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Tableau de Bord",
+    "label": "NetPlus — Tableau de Bord",
+    "module": "Netplus Core",
+    "icon": "dashboard",
+    "is_default": 1,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 1.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Portail NetPlus",
+        "type": "URL",
+        "url": "/portal",
+        "color": "Green"
+      },
+      {
+        "label": "Missions actives",
+        "link_to": "Mission",
+        "type": "DocType",
+        "stats_filter": "{\"mission_status\": \"En cours\"}",
+        "color": "Green",
+        "format": "{} actives"
+      },
+      {
+        "label": "Alertes critiques",
+        "link_to": "Mission Alert",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Ouvert\", \"alert_level\": \"Critique\"}",
+        "color": "Red",
+        "format": "{} alertes"
+      },
+      {
+        "label": "Contrats actifs",
+        "link_to": "Service Contract",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Actif\"}",
+        "color": "Blue",
+        "format": "{} contrats"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Opérations NetPlus",
+        "icon": "tool"
+      },
+      {
+        "type": "Link",
+        "label": "Missions",
+        "link_to": "Mission",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Alertes de Retard",
+        "link_to": "Mission Alert",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Contrats de Service",
+        "link_to": "Service Contract",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Feedback Qualité",
+        "link_to": "Quality Feedback",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Scores Opérateurs",
+        "link_to": "Operator Score",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  },
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Centre de Missions",
+    "label": "NetPlus — Centre de Missions",
+    "module": "Netplus Core",
+    "icon": "project",
+    "is_default": 0,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 2.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Missions planifiées",
+        "link_to": "Mission",
+        "type": "DocType",
+        "stats_filter": "{\"mission_status\": \"Planifi\\u00e9e\"}",
+        "color": "Blue",
+        "format": "{} planifiées"
+      },
+      {
+        "label": "En cours",
+        "link_to": "Mission",
+        "type": "DocType",
+        "stats_filter": "{\"mission_status\": \"En cours\"}",
+        "color": "Green",
+        "format": "{} en cours"
+      },
+      {
+        "label": "Terminées",
+        "link_to": "Mission",
+        "type": "DocType",
+        "stats_filter": "{\"mission_status\": \"Termin\\u00e9e\"}",
+        "color": "Grey",
+        "format": "{} terminées"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Gestion des Missions",
+        "icon": "project"
+      },
+      {
+        "type": "Link",
+        "label": "Toutes les Missions",
+        "link_to": "Mission",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Feuilles de Temps",
+        "link_to": "Timesheet",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Card Break",
+        "label": "Équipes",
+        "icon": "users"
+      },
+      {
+        "type": "Link",
+        "label": "Équipes Superviseur",
+        "link_to": "Supervisor Team",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Employés",
+        "link_to": "Employee",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  },
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Centre d'Alertes",
+    "label": "NetPlus — Centre d'Alertes",
+    "module": "Netplus Core",
+    "icon": "alert-circle",
+    "is_default": 0,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 3.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Alertes ouvertes",
+        "link_to": "Mission Alert",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Ouvert\"}",
+        "color": "Red",
+        "format": "{} alertes"
+      },
+      {
+        "label": "Alertes critiques",
+        "link_to": "Mission Alert",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Ouvert\", \"alert_level\": \"Critique\"}",
+        "color": "Orange",
+        "format": "{} critiques"
+      },
+      {
+        "label": "Acquittées",
+        "link_to": "Mission Alert",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Acquitt\\u00e9\"}",
+        "color": "Grey",
+        "format": "{} acquittées"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Alertes de Retard",
+        "icon": "alert-circle"
+      },
+      {
+        "type": "Link",
+        "label": "Toutes les Alertes",
+        "link_to": "Mission Alert",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  },
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Gestion Contrats",
+    "label": "NetPlus — Gestion Contrats",
+    "module": "Netplus Core",
+    "icon": "file-text",
+    "is_default": 0,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 4.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Contrats actifs",
+        "link_to": "Service Contract",
+        "type": "DocType",
+        "stats_filter": "{\"status\": \"Actif\"}",
+        "color": "Green",
+        "format": "{} actifs"
+      },
+      {
+        "label": "Clients",
+        "link_to": "Customer",
+        "type": "DocType",
+        "color": "Blue",
+        "format": "{} clients"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Contrats",
+        "icon": "file-text"
+      },
+      {
+        "type": "Link",
+        "label": "Contrats de Service",
+        "link_to": "Service Contract",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Link",
+        "label": "Sites de Contrat",
+        "link_to": "Contract Site",
+        "link_type": "DocType"
+      },
+      {
+        "type": "Card Break",
+        "label": "Clients",
+        "icon": "users"
+      },
+      {
+        "type": "Link",
+        "label": "Clients",
+        "link_to": "Customer",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  },
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Feedback Qualité",
+    "label": "NetPlus — Feedback Qualité",
+    "module": "Netplus Core",
+    "icon": "review",
+    "is_default": 0,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 5.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Tous les feedbacks",
+        "link_to": "Quality Feedback",
+        "type": "DocType",
+        "color": "Blue",
+        "format": "{} feedbacks"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Feedback & Qualité",
+        "icon": "review"
+      },
+      {
+        "type": "Link",
+        "label": "Feedback Qualité",
+        "link_to": "Quality Feedback",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  },
+  {
+    "doctype": "Workspace",
+    "name": "NetPlus — Classement Opérateurs",
+    "label": "NetPlus — Classement Opérateurs",
+    "module": "Netplus Core",
+    "icon": "star",
+    "is_default": 0,
+    "is_hidden": 0,
+    "public": 1,
+    "sequence_id": 6.0,
+    "roles": [
+      {"role": "NetPlus Admin"},
+      {"role": "System Manager"},
+      {"role": "Administrator"}
+    ],
+    "shortcuts": [
+      {
+        "label": "Scores opérateurs",
+        "link_to": "Operator Score",
+        "type": "DocType",
+        "color": "Orange",
+        "format": "{} scores"
+      }
+    ],
+    "links": [
+      {
+        "type": "Card Break",
+        "label": "Classements & Scores",
+        "icon": "star"
+      },
+      {
+        "type": "Link",
+        "label": "Scores des Opérateurs",
+        "link_to": "Operator Score",
+        "link_type": "DocType"
+      }
+    ],
+    "creation": "2026-08-01 00:00:00.000000",
+    "modified": "2026-08-13 00:00:00.000000",
+    "modified_by": "Administrator",
+    "owner": "Administrator"
+  }
+]

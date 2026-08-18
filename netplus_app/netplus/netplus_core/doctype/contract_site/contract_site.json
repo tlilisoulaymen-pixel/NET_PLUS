@@ -1,0 +1,27 @@
+{
+ "actions": [],
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": ["site_id", "site_address", "col1", "site_lat", "site_lng", "geofence_radius_meters", "site_instructions"],
+ "fields": [
+  {"fieldname": "site_id", "fieldtype": "Data", "in_list_view": 1, "label": "ID Site", "reqd": 1},
+  {"fieldname": "site_address", "fieldtype": "Data", "in_list_view": 1, "label": "Adresse", "reqd": 1},
+  {"fieldname": "col1", "fieldtype": "Column Break"},
+  {"fieldname": "site_lat", "fieldtype": "Float", "label": "Latitude", "reqd": 1, "precision": "6"},
+  {"fieldname": "site_lng", "fieldtype": "Float", "label": "Longitude", "reqd": 1, "precision": "6"},
+  {"fieldname": "geofence_radius_meters", "fieldtype": "Int", "label": "Rayon Geofence (m)", "default": "200"},
+  {"fieldname": "site_instructions", "fieldtype": "Small Text", "label": "Instructions spécifiques"}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Contract Site",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

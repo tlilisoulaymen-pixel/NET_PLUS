@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#FAFDF9">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>NetPlus Client</title>
+  <link rel="manifest" href="/assets/netplus/client/manifest.json">
+  <link rel="icon" href="/assets/netplus/client/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/netplus/client/app.css?v=1">
+</head>
+<body>
+  <div id="app">
+    <div class="boot-splash">
+      <div class="boot-logo">🍃</div>
+      <div class="boot-text">Chargement…</div>
+    </div>
+  </div>
+
+  <script>
+    window.NETPLUS = {
+      csrf: "{{ csrf_token }}",
+      user: "{{ user }}",
+      fullName: "{{ full_name }}"
+    };
+  </script>
+  <script src="/assets/netplus/client/app.js?v=1"></script>
+</body>
+</html>

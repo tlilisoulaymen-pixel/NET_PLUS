@@ -1,0 +1,3 @@
+include MANIFEST.in
+recursive-include netplus *.json *.js *.css *.html *.py
+recursive-exclude netplus/__pycache__ *

@@ -1,0 +1,34 @@
+{
+ "doctype": "DocType",
+ "name": "NetPlus Settings",
+ "module": "NetPlus",
+ "issingle": 1,
+ "engine": "InnoDB",
+ "field_order": ["geo_section", "default_geofence_radius", "gps_accuracy_threshold",
+  "google_maps_api_key", "alerts_section", "warning_minutes", "alert_minutes",
+  "critical_minutes", "escalation_minutes", "heartbeat_grace_minutes",
+  "feedback_section", "feedback_token_ttl_hours", "feedback_edit_window_hours",
+  "banned_words", "privacy_section", "gps_retention_days"],
+ "fields": [
+  {"fieldname": "geo_section", "fieldtype": "Section Break", "label": "Géolocalisation"},
+  {"fieldname": "default_geofence_radius", "fieldtype": "Int", "label": "Rayon géofence par défaut (m)", "default": "200"},
+  {"fieldname": "gps_accuracy_threshold", "fieldtype": "Int", "label": "Précision GPS max (m)", "default": "100"},
+  {"fieldname": "google_maps_api_key", "fieldtype": "Data", "label": "Clé API Google Maps"},
+  {"fieldname": "alerts_section", "fieldtype": "Section Break", "label": "Alarmes de retard"},
+  {"fieldname": "warning_minutes", "fieldtype": "Int", "label": "Seuil Avertissement (min)", "default": "5"},
+  {"fieldname": "alert_minutes", "fieldtype": "Int", "label": "Seuil Alerte (min)", "default": "15"},
+  {"fieldname": "critical_minutes", "fieldtype": "Int", "label": "Seuil Critique (min)", "default": "30"},
+  {"fieldname": "escalation_minutes", "fieldtype": "Int", "label": "Escalade si non acquittée (min)", "default": "10"},
+  {"fieldname": "heartbeat_grace_minutes", "fieldtype": "Int", "label": "Grâce heartbeat (min)", "default": "15"},
+  {"fieldname": "feedback_section", "fieldtype": "Section Break", "label": "Feedback client"},
+  {"fieldname": "feedback_token_ttl_hours", "fieldtype": "Int", "label": "Validité lien feedback (h)", "default": "72"},
+  {"fieldname": "feedback_edit_window_hours", "fieldtype": "Int", "label": "Fenêtre de modification (h)", "default": "24"},
+  {"fieldname": "banned_words", "fieldtype": "Small Text", "label": "Mots interdits (un par ligne)"},
+  {"fieldname": "privacy_section", "fieldtype": "Section Break", "label": "Confidentialité (Loi 25)"},
+  {"fieldname": "gps_retention_days", "fieldtype": "Int", "label": "Rétention données GPS (jours)", "default": "90"}
+ ],
+ "permissions": [
+  {"role": "System Manager", "read": 1, "write": 1, "create": 1}
+ ]
+}
+

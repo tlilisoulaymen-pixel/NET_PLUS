@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "autoname": "format:ALERT-{YYYY}-{#####}",
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mission",
+  "alert_level",
+  "alert_type",
+  "status",
+  "col1",
+  "supervisor_notified",
+  "admin_notified",
+  "message"
+ ],
+ "fields": [
+  {"fieldname": "mission", "fieldtype": "Link", "label": "Mission", "options": "Mission", "reqd": 1, "in_list_view": 1, "in_standard_filter": 1},
+  {
+   "fieldname": "alert_level",
+   "fieldtype": "Select",
+   "label": "Niveau",
+   "options": "Avertissement\nAlerte\nCritique",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "alert_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Retard\nHeartbeat manquant\nDépart prématuré\nViolation geofence",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Statut",
+   "options": "Ouvert\nAcquitté\nRésolu",
+   "default": "Ouvert",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {"fieldname": "col1", "fieldtype": "Column Break"},
+  {"fieldname": "supervisor_notified", "fieldtype": "Check", "label": "Superviseur notifié", "read_only": 1},
+  {"fieldname": "admin_notified", "fieldtype": "Check", "label": "Admin notifié", "read_only": 1},
+  {"fieldname": "message", "fieldtype": "Small Text", "label": "Message", "reqd": 1}
+ ],
+ "links": [],
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Mission Alert",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "email": 1, "read": 1, "report": 1, "role": "System Manager", "write": 1},
+  {"create": 1, "delete": 0, "read": 1, "report": 1, "role": "NetPlus Admin", "write": 1},
+  {"create": 0, "delete": 0, "read": 1, "role": "NetPlus Supervisor", "write": 1}
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "mission",
+ "track_changes": 1
+}

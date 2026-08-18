@@ -1,0 +1,31 @@
+{
+ "doctype": "DocType",
+ "name": "Mission Operator",
+ "module": "NetPlus",
+ "istable": 1,
+ "engine": "InnoDB",
+ "field_order": ["employee", "employee_name", "is_lead", "check_in", "check_out",
+  "punctuality", "last_heartbeat", "checkin_lat", "checkin_lng", "checkin_accuracy",
+  "checkin_distance_m", "checkout_lat", "checkout_lng", "checkout_accuracy",
+  "checkout_distance_m", "device_info"],
+ "fields": [
+  {"fieldname": "employee", "fieldtype": "Link", "label": "Employé", "options": "Employee", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "employee_name", "fieldtype": "Data", "label": "Nom", "fetch_from": "employee.employee_name", "read_only": 1, "in_list_view": 1},
+  {"fieldname": "is_lead", "fieldtype": "Check", "label": "Lead d'équipe", "in_list_view": 1},
+  {"fieldname": "check_in", "fieldtype": "Datetime", "label": "Check-In", "read_only": 1, "in_list_view": 1},
+  {"fieldname": "check_out", "fieldtype": "Datetime", "label": "Check-Out", "read_only": 1, "in_list_view": 1},
+  {"fieldname": "punctuality", "fieldtype": "Select", "label": "Ponctualité", "options": "\nÀ l'heure\nRetard 5-15\nRetard 15-30\nRetard >30", "read_only": 1},
+  {"fieldname": "last_heartbeat", "fieldtype": "Datetime", "label": "Dernier heartbeat", "read_only": 1},
+  {"fieldname": "checkin_lat", "fieldtype": "Float", "label": "Lat In", "precision": "7", "read_only": 1},
+  {"fieldname": "checkin_lng", "fieldtype": "Float", "label": "Lng In", "precision": "7", "read_only": 1},
+  {"fieldname": "checkin_accuracy", "fieldtype": "Float", "label": "Précision In (m)", "read_only": 1},
+  {"fieldname": "checkin_distance_m", "fieldtype": "Int", "label": "Distance In (m)", "read_only": 1},
+  {"fieldname": "checkout_lat", "fieldtype": "Float", "label": "Lat Out", "precision": "7", "read_only": 1},
+  {"fieldname": "checkout_lng", "fieldtype": "Float", "label": "Lng Out", "precision": "7", "read_only": 1},
+  {"fieldname": "checkout_accuracy", "fieldtype": "Float", "label": "Précision Out (m)", "read_only": 1},
+  {"fieldname": "checkout_distance_m", "fieldtype": "Int", "label": "Distance Out (m)", "read_only": 1},
+  {"fieldname": "device_info", "fieldtype": "Data", "label": "Appareil", "read_only": 1}
+ ],
+ "permissions": []
+}
+

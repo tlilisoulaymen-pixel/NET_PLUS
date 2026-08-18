@@ -1,0 +1,65 @@
+{
+ "actions": [],
+ "autoname": "format:FB-{YYYY}-{#####}",
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mission",
+  "customer",
+  "overall_rating",
+  "recommend",
+  "col1",
+  "team_mode",
+  "lead_employee",
+  "editable_until",
+  "comment",
+  "notes_section",
+  "internal_notes"
+ ],
+ "fields": [
+  {"fieldname": "mission", "fieldtype": "Link", "label": "Mission", "options": "Mission", "reqd": 1, "in_list_view": 1},
+  {"fieldname": "customer", "fieldtype": "Link", "label": "Client", "options": "Customer", "reqd": 1, "in_list_view": 1},
+  {
+   "fieldname": "overall_rating",
+   "fieldtype": "Int",
+   "label": "Note globale (1–5 étoiles)",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "1 = Très mauvais, 5 = Excellent"
+  },
+  {"fieldname": "recommend", "fieldtype": "Check", "label": "Recommanderiez-vous nos services?", "in_list_view": 1},
+  {"fieldname": "col1", "fieldtype": "Column Break"},
+  {
+   "fieldname": "team_mode",
+   "fieldtype": "Select",
+   "label": "Mode de distribution",
+   "options": "Égal\nLead",
+   "default": "Égal",
+   "description": "Comment distribuer le score à l'équipe"
+  },
+  {"fieldname": "lead_employee", "fieldtype": "Link", "label": "Chef d'équipe", "options": "Employee", "depends_on": "eval:doc.team_mode == 'Lead'"},
+  {"fieldname": "editable_until", "fieldtype": "Datetime", "label": "Modifiable jusqu'au", "read_only": 1},
+  {"fieldname": "comment", "fieldtype": "Text", "label": "Commentaire (max 1000 caractères)"},
+  {"fieldname": "notes_section", "fieldtype": "Section Break", "label": "Notes internes"},
+  {"fieldname": "internal_notes", "fieldtype": "Text", "label": "Notes internes"}
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Quality Feedback",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "delete": 1, "email": 1, "read": 1, "report": 1, "role": "System Manager", "submit": 1, "cancel": 1, "write": 1},
+  {"create": 1, "delete": 0, "read": 1, "report": 1, "role": "NetPlus Admin", "submit": 1, "write": 1},
+  {"create": 0, "delete": 0, "read": 1, "role": "NetPlus Supervisor", "write": 0},
+  {"create": 1, "delete": 0, "read": 1, "role": "Customer", "submit": 1, "write": 1}
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "mission",
+ "track_changes": 1
+}

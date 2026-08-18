@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "is_lead",
+  "checkin_time",
+  "checkout_time",
+  "punctuality_status",
+  "col1",
+  "checkin_lat",
+  "checkin_lng",
+  "checkout_lat",
+  "checkout_lng",
+  "last_heartbeat"
+ ],
+ "fields": [
+  {"fieldname": "employee", "fieldtype": "Link", "in_list_view": 1, "label": "Opérateur", "options": "Employee", "reqd": 1},
+  {"fieldname": "is_lead", "fieldtype": "Check", "in_list_view": 1, "label": "Chef d'équipe"},
+  {"fieldname": "checkin_time", "fieldtype": "Datetime", "in_list_view": 1, "label": "Check-In", "read_only": 1},
+  {"fieldname": "checkout_time", "fieldtype": "Datetime", "in_list_view": 1, "label": "Check-Out", "read_only": 1},
+  {
+   "fieldname": "punctuality_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Ponctualité",
+   "options": "\nÀ l'heure\nRetard léger\nRetard modéré\nRetard important\nNon présenté",
+   "read_only": 1
+  },
+  {"fieldname": "col1", "fieldtype": "Column Break"},
+  {"fieldname": "checkin_lat", "fieldtype": "Float", "label": "Lat Check-In", "read_only": 1, "precision": "6"},
+  {"fieldname": "checkin_lng", "fieldtype": "Float", "label": "Lng Check-In", "read_only": 1, "precision": "6"},
+  {"fieldname": "checkout_lat", "fieldtype": "Float", "label": "Lat Check-Out", "read_only": 1, "precision": "6"},
+  {"fieldname": "checkout_lng", "fieldtype": "Float", "label": "Lng Check-Out", "read_only": 1, "precision": "6"},
+  {"fieldname": "last_heartbeat", "fieldtype": "Datetime", "label": "Dernier Heartbeat", "read_only": 1}
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Mission Operator",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

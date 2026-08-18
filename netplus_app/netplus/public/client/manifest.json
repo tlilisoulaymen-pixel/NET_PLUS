@@ -1,0 +1,19 @@
+{
+  "name": "NetPlus Client",
+  "short_name": "NetPlus",
+  "start_url": "/netplus-client",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4FC221",
+  "theme_color": "#FAFDF9",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/assets/netplus/client/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

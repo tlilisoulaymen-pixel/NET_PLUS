@@ -1,0 +1,19 @@
+{
+  "name": "NetPlus Opérateur",
+  "short_name": "NetPlus",
+  "start_url": "/netplus-pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0E13",
+  "theme_color": "#0B0E13",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/assets/netplus/pwa/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

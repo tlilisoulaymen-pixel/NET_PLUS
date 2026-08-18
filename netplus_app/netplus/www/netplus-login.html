@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a7abf">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>NetPlus — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Hard reset — neutralise any inherited browser/Frappe styles */
+    html, body, div, span, h1, h2, h3, p, form,
+    input, button, label, img {
+      all: revert;
+    }
+    *, *::before, *::after {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%; min-height: 100vh;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      overscroll-behavior-y: none;
+      background: #bde4f7;
+    }
+
+    /* ── Full-screen background ── */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background:
+        url("/assets/netplus/login-bg.jpg") center/cover no-repeat;
+      z-index: 0;
+    }
+    /* subtle dark vignette at bottom to anchor the card */
+    .bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(0,83,127,0.08) 0%,
+        rgba(0,83,127,0.22) 100%
+      );
+    }
+
+    /* ── Page layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px max(env(safe-area-inset-bottom), 24px);
+    }
+
+    /* ── Glass card (GlassCard component equivalent) ── */
+    .card {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      box-shadow:
+        0 8px 32px rgba(0,83,127,0.18),
+        0 1px 0 rgba(255,255,255,0.60) inset;
+      color: #1a2e3b;
+      overflow: hidden;
+      animation: rise .4s cubic-bezier(.22,1,.36,1);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(28px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ── Card Header ── */
+    .card-header {
+      padding: 32px 32px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+    }
+
+    /* Logo: mix-blend-mode multiply removes the white PNG background */
+    .logo-img {
+      width: 150px;
+      height: auto;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 2px 8px rgba(0,83,127,0.15));
+      display: block;
+    }
+
+    .card-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: #0a4d72;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: rgba(10,77,114,0.70);
+      line-height: 1.5;
+    }
+
+    .role-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,83,127,0.25);
+      background: rgba(255,255,255,0.45);
+      color: #00537f;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── Card Content ── */
+    .card-content {
+      padding: 28px 32px 0;
+    }
+
+    /* ── Error box ── */
+    .error-box {
+      display: none;
+      background: rgba(220,38,38,0.10);
+      border: 1px solid rgba(220,38,38,0.30);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #b91c1c;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .error-box.visible { display: block; }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0a4d72;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 7px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,83,127,0.25);
+      background: rgba(255,255,255,0.55);
+      color: #0a2540;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      -webkit-appearance: none;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: #00537f;
+      background: rgba(255,255,255,0.80);
+      box-shadow: 0 0 0 3px rgba(0,83,127,0.18);
+    }
+
+    input::placeholder { color: rgba(10,77,114,0.40); }
+
+    /* ── Card Footer ── */
+    .card-footer {
+      padding: 24px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #00537f 0%, #4FC221 100%);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 18px rgba(0,83,127,0.30);
+      letter-spacing: 0.1px;
+    }
+    .btn-primary:hover { box-shadow: 0 6px 24px rgba(0,83,127,0.40); }
+    .btn-primary:active { transform: scale(0.98); opacity: 0.92; }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .spinner  { display: block; }
+    .loading .btn-text { display: none; }
+
+    /* ── Footer note ── */
+    .footer-note {
+      text-align: center;
+      padding: 0 32px 20px;
+      font-size: 11.5px;
+      color: rgba(0,83,127,0.55);
+      line-height: 1.5;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      margin: 0 32px;
+      background: rgba(0,83,127,0.12);
+    }
+
+    /* Responsive tweak for very small phones */
+    @media (max-width: 360px) {
+      .card-header, .card-content, .card-footer { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+
+  <div class="page">
+    <div class="card">
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <img src="/assets/netplus/logo-netplus.png" alt="NetPlus" class="logo-img">
+        <div class="card-title">Connectez-vous à votre compte</div>
+        <div class="card-desc">Entrez vos identifiants pour accéder à votre espace</div>
+        <div class="role-pills">
+          <span class="pill">Opérateur</span>
+          <span class="pill">Superviseur</span>
+          <span class="pill">Client</span>
+          <span class="pill">Admin</span>
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <div class="error-box" id="errBox"></div>
+
+        <form id="loginForm" autocomplete="on" novalidate>
+          <div class="form-group">
+            <label for="emailInput">Adresse courriel</label>
+            <input type="email" id="emailInput" name="email"
+                   placeholder="votre@email.com"
+                   autocomplete="username email"
+                   required>
+          </div>
+          <div class="form-group">
+            <label for="pwdInput">Mot de passe</label>
+            <input type="password" id="pwdInput" name="password"
+                   placeholder="••••••••"
+                   autocomplete="current-password"
+                   required>
+          </div>
+        </form>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <button type="submit" form="loginForm" class="btn-primary" id="submitBtn">
+          <span class="spinner"></span>
+          <span class="btn-text">Continuer</span>
+        </button>
+      </div>
+
+      <div class="footer-note">
+        Accès sécurisé · Opérateurs, Superviseurs, Clients &amp; Administrateurs
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const redirectTo = params.get("redirect-to") || "";
+
+    const form    = document.getElementById("loginForm");
+    const errBox  = document.getElementById("errBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showError(msg) { errBox.textContent = msg; errBox.classList.add("visible"); }
+    function clearError()   { errBox.classList.remove("visible"); }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const usr = document.getElementById("emailInput").value.trim();
+      const pwd = document.getElementById("pwdInput").value;
+      if (!usr || !pwd) { showError("Veuillez remplir tous les champs."); return; }
+
+      submitBtn.disabled = true;
+      submitBtn.classList.add("loading");
+
+      try {
+        // Step 1: clear any existing session (account switching)
+        try {
+          await fetch("/api/method/logout", { method: "POST", redirect: "manual", credentials: "same-origin" });
+        } catch (_) {}
+
+
+        // Step 2: authenticate
+        const resp = await fetch("/api/method/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ usr, pwd }),
+          credentials: "same-origin",
+        });
+        const data = await resp.json().catch(() => ({}));
+
+        if (!resp.ok) {
+          let msg = "Identifiants incorrects.";
+          try {
+            const srv = JSON.parse(data._server_messages || "[]");
+            if (srv.length) msg = JSON.parse(srv[0]).message || msg;
+          } catch (_) {}
+          showError(msg);
+          return;
+        }
+
+        // Step 3: redirect
+        // Tous les utilisateurs passent par le même login, puis sont redirigés
+        // selon leur rôle (data.home_page défini dans auth.py).
+        if (data.home_page) {
+          // Si redirectTo correspond à leur tableau de bord, on le garde (pour les liens profonds comme #/history)
+          if (redirectTo && redirectTo.startsWith(data.home_page)) {
+            location.href = redirectTo;
+          } else {
+            location.href = data.home_page;
+          }
+        } else if (redirectTo) {
+          location.href = redirectTo;
+        } else {
+          location.href = data.default_page || "/";
+        }
+
+      } catch (err) {
+        showError("Erreur de connexion — vérifiez votre réseau.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove("loading");
+      }
+    });
+  </script>
+</body>
+</html>

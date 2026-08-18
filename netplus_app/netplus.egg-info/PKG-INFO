@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: netplus
+Version: 2.0.0
+Summary: NetPlus Services de Nettoyage Professionnel — ERPNext Custom App
+Author: NetPlus Inc.
+Author-email: direction@netplusinc.ca
+Requires-Dist: frappe
+Requires-Dist: qrcode[pil]
+Requires-Dist: Pillow>=10.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: requires-dist
+Dynamic: summary

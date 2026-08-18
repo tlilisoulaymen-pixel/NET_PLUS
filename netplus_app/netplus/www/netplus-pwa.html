@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0B0E13">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>NetPlus Opérateur</title>
+  <meta name="description" content="Application opérateur NetPlus — pointage GPS, missions, anomalies">
+  <link rel="manifest" href="/assets/netplus/pwa/manifest.json">
+  <link rel="icon" href="/assets/netplus/pwa/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/netplus/pwa/app.css?v=9">
+</head>
+<body>
+  <div id="app">
+    <div class="boot-splash">
+      <div class="boot-logo">N+</div>
+      <div class="boot-text">Chargement…</div>
+    </div>
+  </div>
+
+  <script>
+    window.NETPLUS = {
+      csrf: "{{ csrf_token }}",
+      user: "{{ user }}",
+      fullName: "{{ full_name }}",
+      mapsKey: "AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ"
+    };
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=marker&loading=async" async defer></script>
+  <script src="/assets/netplus/pwa/app.js?v=9"></script>
+</body>
+</html>
+
+
+
+
+
+
+

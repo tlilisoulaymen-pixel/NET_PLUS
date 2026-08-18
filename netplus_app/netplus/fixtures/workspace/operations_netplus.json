@@ -1,0 +1,84 @@
+{
+ "actions": [],
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "Workspace",
+ "icon": "settings",
+ "is_default": 0,
+ "is_hidden": 0,
+ "label": "Opérations NetPlus",
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Opérations NetPlus",
+ "owner": "Administrator",
+ "public": 1,
+ "roles": [
+  {"role": "NetPlus Admin"},
+  {"role": "System Manager"}
+ ],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "format": "{} actives",
+   "label": "Missions actives",
+   "link_to": "Mission",
+   "stats_filter": "{\"mission_status\": \"En cours\"}",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "format": "{} alertes",
+   "label": "Alertes critiques",
+   "link_to": "Mission Alert",
+   "stats_filter": "{\"alert_level\": \"Critique\", \"status\": \"Ouvert\"}",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "label": "Contrats actifs",
+   "link_to": "Service Contract",
+   "stats_filter": "{\"status\": \"Actif\"}",
+   "type": "DocType"
+  },
+  {
+   "label": "Paramètres",
+   "link_to": "NetPlus Settings",
+   "type": "DocType"
+  }
+ ],
+ "links": [
+  {
+   "label": "Opérations",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {"label": "Missions", "link_to": "Mission", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {"label": "Contrats de service", "link_to": "Service Contract", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {"label": "Alertes missions", "link_to": "Mission Alert", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {
+   "label": "RH & Équipes",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {"label": "Employés", "link_to": "Employee", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {"label": "Clients", "link_to": "Customer", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {
+   "label": "Qualité & Scores",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {"label": "Feedback clients", "link_to": "Quality Feedback", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {"label": "Scores opérateurs", "link_to": "Operator Score", "link_type": "DocType", "onboard": 1, "type": "Link"},
+  {
+   "label": "Configuration",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {"label": "Paramètres NetPlus", "link_to": "NetPlus Settings", "link_type": "DocType", "onboard": 1, "type": "Link"}
+ ]
+}

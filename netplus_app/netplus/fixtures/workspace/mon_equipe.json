@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "creation": "2026-08-12 00:00:00.000000",
+ "doctype": "Workspace",
+ "extends": "",
+ "icon": "group",
+ "is_default": 0,
+ "is_hidden": 0,
+ "label": "Mon Équipe",
+ "modified": "2026-08-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Netplus Core",
+ "name": "Mon Équipe",
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "restrict_to_domain": "",
+ "roles": [
+  {"role": "NetPlus Supervisor"}
+ ],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "format": "{} en cours",
+   "label": "Missions actives",
+   "link_to": "Mission",
+   "stats_filter": "{\"mission_status\": \"En cours\"}",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "format": "{} alertes",
+   "label": "Alertes ouvertes",
+   "link_to": "Mission Alert",
+   "stats_filter": "{\"status\": \"Ouvert\"}",
+   "type": "DocType"
+  },
+  {
+   "label": "Nouveau Contrat",
+   "link_to": "Service Contract",
+   "type": "DocType"
+  },
+  {
+   "label": "Mes Opérateurs",
+   "link_to": "Employee",
+   "type": "DocType"
+  },
+  {
+   "label": "Scores équipe",
+   "link_to": "Operator Score",
+   "type": "DocType"
+  }
+ ],
+ "content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Mon Équipe</b></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Opérations\",\"col\":6}},{\"type\":\"card\",\"data\":{\"card_name\":\"Scores & Feedback\",\"col\":6}}]",
+ "links": [
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Opérations",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Missions du jour",
+   "link_to": "Mission",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Contrats actifs",
+   "link_to": "Service Contract",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Alertes mission",
+   "link_to": "Mission Alert",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Scores & Feedback",
+   "link_count": 0,
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Scores opérateurs",
+   "link_to": "Operator Score",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Feedback clients",
+   "link_to": "Quality Feedback",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "dependencies": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Mon Équipe",
+   "link_to": "Employee",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  }
+ ]
+}

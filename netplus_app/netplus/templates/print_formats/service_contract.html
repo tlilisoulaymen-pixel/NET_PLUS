@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 11pt; color: #1e293b; }
+    .header { display:flex; justify-content:space-between; align-items:flex-start; padding:24px 0 16px; border-bottom: 2px solid #3b82f6; margin-bottom: 24px; }
+    .logo { font-size: 22pt; font-weight: 700; color: #1e293b; }
+    .logo span { color: #3b82f6; }
+    .contract-id { font-size: 9pt; color: #64748b; margin-top: 4px; font-family: monospace; }
+    .badge { display:inline-block; padding:4px 12px; background:#dcfce7; color:#166534; border-radius:99px; font-size:9pt; font-weight:600; }
+    h1 { font-size: 16pt; font-weight: 700; margin-bottom: 6px; }
+    h2 { font-size: 11pt; font-weight: 600; color: #3b82f6; margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .info-block { background: #f8fafc; border-radius: 8px; padding: 12px; }
+    .info-block .label { font-size: 8pt; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .info-block .value { font-size: 11pt; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th { background: #f1f5f9; padding: 8px 10px; text-align: left; font-size: 9pt; font-weight: 600; color: #475569; }
+    td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; font-size: 10pt; }
+    tr:last-child td { border-bottom: none; }
+    .qr-section { display: flex; align-items: center; gap: 20px; background: #f8fafc; border-radius: 8px; padding: 16px; margin-top: 20px; }
+    .qr-section img { width: 100px; height: 100px; }
+    .qr-info .title { font-weight: 600; margin-bottom: 4px; }
+    .qr-info .sub { font-size: 9pt; color: #64748b; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; color: #64748b; font-size: 8pt; }
+    .sig-block { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+    .sig-line { border-top: 1px solid #94a3b8; padding-top: 8px; text-align: center; color: #475569; font-size: 9pt; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="logo">Net<span>Plus</span></div>
+      <div class="contract-id">Services de Nettoyage Professionnel · netplusinc.ca</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:14pt;font-weight:700">CONTRAT DE SERVICE</div>
+      <div class="contract-id">{{ doc.name }}</div>
+      <div style="margin-top:6px"><span class="badge">{{ doc.status }}</span></div>
+    </div>
+  </div>
+
+  <!-- Parties -->
+  <h2>Parties</h2>
+  <div class="grid-2">
+    <div class="info-block">
+      <div class="label">Fournisseur</div>
+      <div class="value">NetPlus Inc.</div>
+      <div style="font-size:9pt;color:#64748b;margin-top:4px">direction@netplusinc.ca · netplusinc.ca</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Client</div>
+      <div class="value">{{ doc.customer }}</div>
+      <div style="font-size:9pt;color:#64748b;margin-top:4px">Superviseur : {{ doc.supervisor }}</div>
+    </div>
+  </div>
+
+  <!-- Contract Details -->
+  <h2>Détails du contrat</h2>
+  <div class="grid-2">
+    <div class="info-block">
+      <div class="label">Date d'entrée en vigueur</div>
+      <div class="value">{{ doc.effective_date }}</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Date d'expiration</div>
+      <div class="value">{{ doc.expiration_date }}</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Type de service</div>
+      <div class="value">{{ doc.service_type }}</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Mode d'équipe</div>
+      <div class="value">{{ doc.team_mode }}{% if doc.requires_team_lead %} (chef requis){% endif %}</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Tarif par intervention</div>
+      <div class="value">{{ doc.rate_per_intervention }} {{ doc.currency }}</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Cycle de facturation</div>
+      <div class="value">{{ doc.billing_cycle }} · {{ doc.payment_terms_days }}j</div>
+    </div>
+  </div>
+
+  <!-- Schedule -->
+  <h2>Fréquence d'intervention</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Jour</th>
+        <th>Heure de début</th>
+        <th>Durée estimée</th>
+        <th>Chef requis</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for day in doc.contract_days %}
+      <tr>
+        <td><strong>{{ day.day_of_week }}</strong></td>
+        <td>{{ day.start_time }}</td>
+        <td>{{ day.estimated_duration }}h</td>
+        <td>{% if day.require_team_lead %}✓{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Sites -->
+  <h2>Sites d'intervention</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID Site</th>
+        <th>Adresse</th>
+        <th>Rayon Geofence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for site in doc.contract_sites %}
+      <tr>
+        <td><code>{{ site.site_id }}</code></td>
+        <td>{{ site.site_address }}</td>
+        <td>{{ site.geofence_radius_meters }}m</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- SLA -->
+  <h2>SLA & Conformité</h2>
+  <div class="grid-2">
+    <div class="info-block">
+      <div class="label">Check-in géofencé</div>
+      <div class="value">Obligatoire (200m)</div>
+    </div>
+    <div class="info-block">
+      <div class="label">Lois applicables</div>
+      <div class="value">{{ doc.applicable_laws or 'Loi 25 (QC), PIPEDA' }}</div>
+    </div>
+  </div>
+
+  <!-- QR Code -->
+  {% if doc.qr_code_image %}
+  <div class="qr-section">
+    <img src="{{ doc.qr_code_image }}" alt="QR Code contrat" />
+    <div class="qr-info">
+      <div class="title">🔍 Code de vérification</div>
+      <div class="sub">
+        Scannez ce code avec l'application NetPlus Opérateur pour vérifier l'authenticité de ce contrat
+        et activer le check-in géofencé sur les sites autorisés.
+      </div>
+      <div class="sub" style="margin-top:6px;font-family:monospace">Contrat : {{ doc.name }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Signatures -->
+  <div class="sig-block">
+    <div class="sig-line">Représentant NetPlus</div>
+    <div class="sig-line">Client — {{ doc.customer }}</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>NetPlus Inc. · direction@netplusinc.ca · netplusinc.ca</div>
+    <div>Généré le {{ frappe.utils.now_datetime().strftime('%Y-%m-%d %H:%M') }}</div>
+  </div>
+</body>
+</html>

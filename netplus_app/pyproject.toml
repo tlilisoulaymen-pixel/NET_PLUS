@@ -1,0 +1,11 @@
+[project]
+name = "netplus"
+version = "0.1.0"
+description = "NetPlus Operations - missions, GPS check-in/out, client feedback & operator scoring on ERPNext"
+requires-python = ">=3.10"
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+

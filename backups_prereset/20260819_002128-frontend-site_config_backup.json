@@ -1,0 +1,14 @@
+{
+ "db_name": "_0764a28ed148de76",
+ "db_password": "4iSbyAp94CKbDa5j",
+ "db_type": "mariadb",
+ "db_user": "_0764a28ed148de76",
+ "developer_mode": 1,
+ "encryption_key": "MfJSzY-YY_Uocv2nZQPyfwNnjOJZpicLEzCVZ4uLO7s=",
+ "installed_apps": [
+  "frappe",
+  "erpnext",
+  "netplus"
+ ],
+ "mute_emails": 1
+}

@@ -1,0 +1,101 @@
+{% extends "templates/web.html" %}
+{% block title %}Votre avis — NetPlus{% endblock %}
+{% block page_content %}
+<style>
+  :root { --bg:#0b1220; --card:#111a2e; --line:#1e2a44; --tx:#e6edf7;
+          --mut:#8ea0bf; --em:#10b981; }
+  body { background:var(--bg); color:var(--tx); }
+  .fb { max-width:520px; margin:0 auto; padding:24px 16px; font-family:Inter,system-ui,sans-serif; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .starrow { font-size:42px; cursor:pointer; user-select:none; letter-spacing:6px; }
+  .starrow span { color:#334155; transition:color .1s; }
+  .starrow span.on { color:#fbbf24; }
+  .cats { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+  .cats label { border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+                cursor:pointer; font-size:13px; color:var(--mut); }
+  .cats input { display:none; }
+  .cats label.on { border-color:var(--em); color:var(--em); }
+  textarea { width:100%; background:#0d1626; color:var(--tx); border:1px solid var(--line);
+             border-radius:8px; padding:10px; }
+  .btn { width:100%; background:var(--em); color:#04211a; font-weight:800; border:none;
+         border-radius:10px; padding:14px; font-size:16px; margin-top:14px; cursor:pointer; }
+  .nps { display:flex; gap:10px; margin:8px 0; }
+  .nps button { flex:1; background:#0d1626; border:1px solid var(--line); color:var(--mut);
+                border-radius:9px; padding:10px; cursor:pointer; }
+  .nps button.on { border-color:var(--em); color:var(--em); }
+</style>
+
+<div class="fb"><div class="card" id="box">Chargement…</div></div>
+
+<script>
+const TOKEN = "{{ token }}";
+let rating = 0, recommend = null;
+
+async function api(m, args) {
+  const r = await fetch("/api/method/netplus.api.portal_api." + m, {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(args || {})});
+  const j = await r.json();
+  if (!r.ok) {
+    let msg = "Erreur"; try { msg = JSON.parse(JSON.parse(j._server_messages)[0]).message; } catch(e) {}
+    throw new Error(msg);
+  }
+  return j.message;
+}
+
+const MSG = {1:"Désolés de vous avoir déçu 😔",2:"Nous ferons mieux.",3:"Merci !",
+             4:"Merci beaucoup !",5:"Merci ! 🎉"};
+
+async function init() {
+  try {
+    const t = await api("resolve_feedback_token", { token: TOKEN });
+    document.getElementById("box").innerHTML = `
+      <h4 style="margin-top:0">Évaluez « ${t.subject} »</h4>
+      <div class="starrow" id="stars">${[1,2,3,4,5].map(i =>
+        `<span data-i="${i}" onclick="setStars(${i})">★</span>`).join("")}</div>
+      <div id="star-msg" style="color:var(--mut);height:22px"></div>
+      <div class="cats" id="cats">${t.categories.map(c =>
+        `<label onclick="this.classList.toggle('on')"><input type="checkbox" value="${c}">${c}</label>`).join("")}</div>
+      <textarea id="comment" rows="4" maxlength="1000"
+        placeholder="Commentaire (optionnel, max 1000 caractères)…"
+        oninput="document.getElementById('cnt').textContent=this.value.length+'/1000'"></textarea>
+      <div id="cnt" style="color:var(--mut);font-size:12px;text-align:right">0/1000</div>
+      <p style="margin:10px 0 4px">Recommanderiez-vous NetPlus à un collègue ?</p>
+      <div class="nps">
+        <button id="nps-y" onclick="setNps(1)">👍 Oui</button>
+        <button id="nps-n" onclick="setNps(0)">👎 Non</button>
+      </div>
+      <button class="btn" onclick="send()">Envoyer mon évaluation</button>`;
+  } catch (e) {
+    document.getElementById("box").innerHTML =
+      `<b>Lien invalide ou expiré.</b><br><span style="color:var(--mut)">${e.message}</span>`;
+  }
+}
+
+function setStars(n) {
+  rating = n;
+  document.querySelectorAll("#stars span").forEach(s =>
+    s.classList.toggle("on", +s.dataset.i <= n));
+  document.getElementById("star-msg").textContent = MSG[n];
+}
+function setNps(v) {
+  recommend = v;
+  document.getElementById("nps-y").classList.toggle("on", v === 1);
+  document.getElementById("nps-n").classList.toggle("on", v === 0);
+}
+
+async function send() {
+  if (!rating) { alert("Choisissez une note (1-5 étoiles)."); return; }
+  const cats = [...document.querySelectorAll("#cats input:checked")].map(i => i.value);
+  try {
+    const r = await api("submit_feedback", { token: TOKEN, rating,
+      comment: document.getElementById("comment").value,
+      categories: cats, recommend: recommend ? 1 : 0 });
+    document.getElementById("box").innerHTML =
+      `<h3 style="color:var(--em)">✅ ${r.message}</h3>
+       <p style="color:var(--mut)">Vous pouvez modifier votre évaluation pendant 24h via le même lien.</p>`;
+  } catch (e) { alert(e.message); }
+}
+init();
+</script>
+{% endblock %}

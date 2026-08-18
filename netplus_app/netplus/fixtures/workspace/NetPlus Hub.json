@@ -1,0 +1,107 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"section_netplus\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">NetPlus — Hub Administrateur</span>\",\"col\":12}},{\"id\":\"col_modules\",\"type\":\"col-break\",\"data\":{}},{\"id\":\"shortcut_missions\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mission\",\"col\":4}},{\"id\":\"shortcut_monitoring\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Monitoring Live\",\"col\":4}},{\"id\":\"shortcut_supervision\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Portail Supervision\",\"col\":4}},{\"id\":\"shortcut_operator\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Portail Opérateur\",\"col\":4}},{\"id\":\"shortcut_client\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Portail Client\",\"col\":4}},{\"id\":\"shortcut_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Paramètres NetPlus\",\"col\":4}},{\"id\":\"section_doctypes\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Gestion des données</span>\",\"col\":12}},{\"id\":\"shortcut_contracts\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Contract\",\"col\":4}},{\"id\":\"shortcut_locations\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Location\",\"col\":4}},{\"id\":\"shortcut_employees\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employee\",\"col\":4}}]",
+ "creation": "2026-08-16 00:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends": "",
+ "extends_another_page": 0,
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "✦",
+ "indicator_color": "green",
+ "is_default": 1,
+ "is_hidden": 0,
+ "label": "NetPlus Hub",
+ "modified": "2026-08-16 00:00:00.000000",
+ "module": "NetPlus",
+ "name": "NetPlus Hub",
+ "number_cards": [],
+ "onboarding": "",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [{"role": "System Manager"}, {"role": "Administrator"}],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Mission(s)",
+   "icon": "mission",
+   "label": "Mission",
+   "link_to": "Mission",
+   "name": "shortcut-mission",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "icon": "map",
+   "label": "Monitoring Live",
+   "link_to": "/netplus-monitoring",
+   "name": "shortcut-monitoring",
+   "type": "URL"
+  },
+  {
+   "color": "Cyan",
+   "icon": "user",
+   "label": "Portail Supervision",
+   "link_to": "/netplus-supervision",
+   "name": "shortcut-supervision",
+   "type": "URL"
+  },
+  {
+   "color": "Orange",
+   "icon": "solid star",
+   "label": "Portail Opérateur",
+   "link_to": "/netplus-pwa",
+   "name": "shortcut-operator",
+   "type": "URL"
+  },
+  {
+   "color": "Purple",
+   "icon": "heart",
+   "label": "Portail Client",
+   "link_to": "/netplus-client",
+   "name": "shortcut-client",
+   "type": "URL"
+  },
+  {
+   "color": "Gray",
+   "icon": "setting",
+   "label": "Paramètres NetPlus",
+   "link_to": "NetPlus Settings",
+   "name": "shortcut-settings",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "icon": "file",
+   "label": "Service Contract",
+   "link_to": "Service Contract",
+   "name": "shortcut-contracts",
+   "type": "DocType"
+  },
+  {
+   "color": "Pink",
+   "doc_view": "List",
+   "icon": "map-pin",
+   "label": "Location",
+   "link_to": "Location",
+   "name": "shortcut-locations",
+   "type": "DocType"
+  },
+  {
+   "color": "Light Blue",
+   "doc_view": "List",
+   "icon": "users",
+   "label": "Employee",
+   "link_to": "Employee",
+   "name": "shortcut-employees",
+   "type": "DocType"
+  }
+ ],
+ "title": "NetPlus Hub"
+}

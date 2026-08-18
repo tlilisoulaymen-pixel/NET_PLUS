@@ -1,0 +1,29 @@
+{
+ "doctype": "DocType",
+ "name": "Operator Score",
+ "module": "NetPlus",
+ "autoname": "format:SCORE-{employee}",
+ "engine": "InnoDB",
+ "field_order": ["employee", "rank", "global_score", "avg_stars",
+  "quality_score", "punctuality_score", "completion_score", "penalties",
+  "missions_count", "computed_at"],
+ "fields": [
+  {"fieldname": "employee", "fieldtype": "Link", "label": "Employé", "options": "Employee", "reqd": 1, "unique": 1, "in_list_view": 1},
+  {"fieldname": "rank", "fieldtype": "Int", "label": "Rang", "in_list_view": 1},
+  {"fieldname": "global_score", "fieldtype": "Float", "label": "Score global /100", "in_list_view": 1},
+  {"fieldname": "avg_stars", "fieldtype": "Float", "label": "Moyenne étoiles"},
+  {"fieldname": "quality_score", "fieldtype": "Float", "label": "Qualité /50"},
+  {"fieldname": "punctuality_score", "fieldtype": "Float", "label": "Ponctualité /30"},
+  {"fieldname": "completion_score", "fieldtype": "Float", "label": "Complétion /20"},
+  {"fieldname": "penalties", "fieldtype": "Float", "label": "Pénalités"},
+  {"fieldname": "missions_count", "fieldtype": "Int", "label": "Missions (90j)"},
+  {"fieldname": "computed_at", "fieldtype": "Datetime", "label": "Calculé le", "read_only": 1}
+ ],
+ "permissions": [
+  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+  {"role": "NetPlus Supervisor", "read": 1}
+ ],
+ "sort_field": "global_score",
+ "sort_order": "DESC"
+}
+

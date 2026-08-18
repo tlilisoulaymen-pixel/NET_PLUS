@@ -1,0 +1,26 @@
+{
+  "content": null,
+  "creation": "2026-08-13 00:00:00",
+  "docstatus": 0,
+  "doctype": "Page",
+  "icon": "octicon octicon-briefcase",
+  "idx": 0,
+  "modified": "2026-08-13 00:00:00",
+  "modified_by": "Administrator",
+  "module": "Netplus Core",
+  "name": "netplus-dashboard",
+  "owner": "Administrator",
+  "page_name": "netplus-dashboard",
+  "restrict_to_domain": "",
+  "roles": [
+    { "role": "NetPlus Admin" },
+    { "role": "NetPlus Supervisor" },
+    { "role": "NetPlus Client" },
+    { "role": "Customer" },
+    { "role": "System Manager" },
+    { "role": "Administrator" }
+  ],
+  "standard": "Yes",
+  "system_page": 0,
+  "title": "NetPlus Dashboard"
+}

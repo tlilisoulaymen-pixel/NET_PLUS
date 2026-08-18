@@ -1,0 +1,19 @@
+{
+  "name": "NetPlus Supervision",
+  "short_name": "Supervision",
+  "start_url": "/netplus-supervision",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a2e",
+  "theme_color": "#F5F5F7",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/assets/netplus/supervision/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

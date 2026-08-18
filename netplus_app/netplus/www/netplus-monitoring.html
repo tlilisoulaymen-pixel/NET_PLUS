@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080B10">
+  <title>NetPlus — Monitoring Temps Réel</title>
+  <meta name="description" content="Dashboard de monitoring en temps réel des opérateurs et superviseurs NetPlus">
+  <link rel="icon" href="/assets/netplus/pwa/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/netplus/monitoring/app.css?v=5">
+</head>
+<body>
+  <div id="app">
+    <div class="splash">
+      <div class="splash-logo">N+</div>
+      <div class="splash-text">Chargement du monitoring…</div>
+    </div>
+  </div>
+
+  <script>
+    window.NETPLUS = {
+      csrf: "{{ csrf_token }}",
+      user: "{{ user }}",
+      fullName: "{{ full_name }}",
+      mapsKey: "AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ"
+    };
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=marker&loading=async" async defer></script>
+  <script src="/assets/netplus/monitoring/app.js?v=5"></script>
+</body>
+</html>
+

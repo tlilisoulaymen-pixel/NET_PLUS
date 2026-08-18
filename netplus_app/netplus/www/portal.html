@@ -1,0 +1,191 @@
+{% extends "templates/web.html" %}
+{% block title %}NetPlus — Portail{% endblock %}
+{% block page_content %}
+<style>
+  :root { --bg:#0b1220; --card:#111a2e; --line:#1e2a44; --tx:#e6edf7;
+          --mut:#8ea0bf; --em:#10b981; --warn:#f59e0b; --crit:#ef4444; }
+  body { background:var(--bg); color:var(--tx); }
+  .np-wrap { max-width:1200px; margin:0 auto; padding:24px 16px; font-family:Inter,system-ui,sans-serif; }
+  .np-h { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .np-h h2 { color:var(--em); margin:0; }
+  .np-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; }
+  .np-card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .np-kpi { font-size:30px; font-weight:700; color:var(--em); }
+  .np-kpi-l { color:var(--mut); font-size:13px; }
+  table.np { width:100%; border-collapse:collapse; margin-top:8px; font-size:14px; }
+  table.np th { text-align:left; color:var(--mut); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--line); }
+  table.np td { padding:8px; border-bottom:1px solid var(--line); }
+  .badge { padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+  .b-ok { background:#064e3b; color:#6ee7b7; } .b-warn { background:#78350f; color:#fcd34d; }
+  .b-crit { background:#7f1d1d; color:#fca5a5; } .b-mut { background:#1e293b; color:#94a3b8; }
+  .stars { color:#fbbf24; letter-spacing:2px; }
+  .np-btn { background:var(--em); color:#04211a; border:none; border-radius:9px;
+            padding:7px 14px; font-weight:700; cursor:pointer; }
+  .np-btn.ghost { background:transparent; color:var(--em); border:1px solid var(--em); }
+  .section-t { margin:26px 0 8px; color:var(--tx); font-size:17px; font-weight:700; }
+  .alert-row { border-left:4px solid var(--warn); }
+  .alert-row.crit { border-left-color:var(--crit); }
+  #np-modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
+              align-items:center; justify-content:center; z-index:50; }
+  #np-modal .box { background:var(--card); border:1px solid var(--line);
+                   border-radius:14px; padding:22px; width:min(440px,92vw); }
+  textarea, input[type=date] { width:100%; background:#0d1626; color:var(--tx);
+              border:1px solid var(--line); border-radius:8px; padding:8px; }
+</style>
+
+<div class="np-wrap" data-role="{{ role }}">
+  <div class="np-h">
+    <h2>NetPlus — {{ "Supervision" if role == "supervisor" else "Espace Client" if role == "client" else "Direction" }}</h2>
+    <div style="color:var(--mut)">{{ full_name }} · <a href="/?cmd=web_logout" style="color:var(--em)">Déconnexion</a></div>
+  </div>
+  <div id="np-kpis" class="np-grid"></div>
+  <div id="np-alerts"></div>
+  <div id="np-main"></div>
+</div>
+
+<div id="np-modal"><div class="box">
+  <h4 style="margin-top:0">Acquitter l'alerte</h4>
+  <p style="color:var(--mut);font-size:13px">Une justification est enregistrée dans l'audit (trafic, véhicule, etc.).</p>
+  <textarea id="ack-just" rows="3" placeholder="Justification…"></textarea>
+  <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+    <button class="np-btn ghost" onclick="closeModal()">Annuler</button>
+    <button class="np-btn" onclick="confirmAck()">Acquitter</button>
+  </div>
+</div></div>
+
+<script>
+const CSRF = "{{ csrf_token }}";
+const ROLE = document.querySelector(".np-wrap").dataset.role;
+let DATA = null, ackTarget = null;
+
+async function api(method, args) {
+  const r = await fetch("/api/method/netplus.api.portal_api." + method, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Frappe-CSRF-Token": CSRF },
+    body: JSON.stringify(args || {})
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error((j._server_messages && JSON.parse(j._server_messages)[0]) || j.exception || "Erreur");
+  return j.message;
+}
+
+const stars = n => "★".repeat(Math.round(n || 0)) + "☆".repeat(5 - Math.round(n || 0));
+const badge = s => ({"Planifiée":"b-mut","En cours":"b-warn","Terminée":"b-ok",
+                     "En retard critique":"b-crit","Annulée":"b-mut"}[s] || "b-mut");
+
+async function load() {
+  DATA = await api("get_dashboard_data");
+  renderKpis(); renderAlerts(); renderMain();
+}
+
+function renderKpis() {
+  const k = [];
+  const missions = DATA.missions || [];
+  const done = missions.filter(m => m.mission_status === "Terminée").length;
+  const onTime = missions.flatMap(m => m.operators || [])
+                         .filter(o => o.punctuality === "À l'heure").length;
+  if (ROLE === "supervisor") {
+    k.push(["Opérateurs (équipe)", (DATA.team || []).length]);
+    k.push(["Missions", missions.length]);
+    k.push(["Alertes ouvertes", (DATA.alerts || []).length]);
+    const best = (DATA.scores || [])[0];
+    k.push(["Meilleur score", best ? best.global_score + "/100" : "—"]);
+  } else if (ROLE === "client") {
+    const fb = DATA.feedbacks || [];
+    const avg = fb.length ? fb.reduce((a, f) => a + f.overall_rating, 0) / fb.length : 0;
+    k.push(["Interventions", missions.length]);
+    k.push(["Terminées", done]);
+    k.push(["Satisfaction moyenne", avg ? avg.toFixed(1) + " ★" : "—"]);
+    k.push(["Feedbacks à donner", missions.filter(m => m.feedback_status === "En attente").length]);
+  } else {
+    k.push(["Missions", missions.length]);
+    k.push(["Alertes ouvertes", (DATA.alerts || []).length]);
+    k.push(["NPS entreprise", DATA.nps ?? "—"]);
+    k.push(["Check-ins à l'heure", onTime]);
+  }
+  document.getElementById("np-kpis").innerHTML = k.map(([l, v]) =>
+    `<div class="np-card"><div class="np-kpi">${v}</div><div class="np-kpi-l">${l}</div></div>`).join("");
+}
+
+function renderAlerts() {
+  const el = document.getElementById("np-alerts");
+  const alerts = DATA.alerts || [];
+  if (!alerts.length || ROLE === "client") { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="section-t">⚠ Alertes de retard</div>` + alerts.map(a => `
+    <div class="np-card alert-row ${a.level === "Critique" ? "crit" : ""}" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <div><b>[${a.level}]</b> ${a.message} <span style="color:var(--mut)">· ${a.operator}</span></div>
+      ${ROLE !== "client" ? `<button class="np-btn ghost" onclick="openAck('${a.name}')">Acquitter</button>` : ""}
+    </div>`).join("");
+}
+
+function renderMain() {
+  const el = document.getElementById("np-main");
+  let html = `<div class="section-t">Missions</div><div class="np-card"><table class="np">
+    <tr><th>Mission</th><th>Date</th><th>Statut</th><th>${ROLE === "client" ? "Feedback" : "Équipe"}</th></tr>`;
+  for (const m of DATA.missions || []) {
+    const extra = ROLE === "client"
+      ? (m.feedback_status === "En attente" && m.feedback_token
+          ? `<a class="np-btn" href="/feedback?token=${m.feedback_token}">Évaluer</a>`
+          : (m.feedback_status || "—"))
+      : (m.operators || []).map(o => o.employee_name + (o.is_lead ? " ⭐" : "")).join(", ");
+    html += `<tr><td>${m.subject}</td><td>${(m.scheduled_start || "").slice(0, 16)}</td>
+      <td><span class="badge ${badge(m.mission_status)}">${m.mission_status}</span></td><td>${extra}</td></tr>`;
+  }
+  html += "</table></div>";
+
+  if (ROLE !== "client" && (DATA.scores || []).length) {
+    html += `<div class="section-t">🏆 Classement opérateurs</div><div class="np-card"><table class="np">
+      <tr><th>#</th><th>Opérateur</th><th>Étoiles</th><th>Qualité</th><th>Ponctualité</th><th>Complétion</th><th>Score</th></tr>` +
+      DATA.scores.map(s => `<tr><td>${s.rank || "—"}</td><td>${s.employee}</td>
+        <td class="stars">${stars(s.avg_stars)}</td><td>${s.quality_score}/50</td>
+        <td>${s.punctuality_score}/30</td><td>${s.completion_score}/20</td>
+        <td><b>${s.global_score}</b>/100</td></tr>`).join("") + "</table></div>";
+  }
+
+  if ((DATA.contracts || []).length) {
+    html += `<div class="section-t">📄 Contrats</div><div class="np-card"><table class="np">
+      <tr><th>Contrat</th><th>Statut</th><th>Du</th><th>Au</th><th></th></tr>` +
+      DATA.contracts.map(c => `<tr><td>${c.name}</td>
+        <td><span class="badge ${c.status === "Active" ? "b-ok" : "b-mut"}">${c.status}</span></td>
+        <td>${c.effective_date}</td><td>${c.expiration_date}</td>
+        <td>${ROLE === "supervisor" ? `<button class="np-btn ghost" onclick="genMissions('${c.name}')">Générer missions</button>` : ""}
+            <a class="np-btn ghost" href="/printview?doctype=Service Contract&name=${c.name}&format=Standard" target="_blank">PDF</a></td></tr>`).join("") +
+      "</table></div>";
+  }
+
+  if (ROLE === "client" && (DATA.trend || []).length) {
+    html += `<div class="section-t">Évolution satisfaction (6 mois)</div><div class="np-card">` +
+      DATA.trend.map(t => `<div style="display:flex;gap:10px;align-items:center;margin:4px 0">
+        <span style="width:70px;color:var(--mut)">${t.month}</span>
+        <div style="background:var(--em);height:10px;border-radius:5px;width:${t.avg_rating * 18}%"></div>
+        <span>${Number(t.avg_rating).toFixed(1)} ★ (${t.n})</span></div>`).join("") + "</div>";
+  }
+  el.innerHTML = html;
+}
+
+// -------- alert acknowledgement --------
+function openAck(name) { ackTarget = name; document.getElementById("np-modal").style.display = "flex"; }
+function closeModal() { document.getElementById("np-modal").style.display = "none"; }
+async function confirmAck() {
+  await api("acknowledge_alert", { alert: ackTarget,
+    justification: document.getElementById("ack-just").value });
+  closeModal(); load();
+}
+
+// -------- contract -> missions generation (supervisor) --------
+async function genMissions(contract) {
+  const from = prompt("Générer les missions du (YYYY-MM-DD) :");
+  const to = from && prompt("au (YYYY-MM-DD) :");
+  const days = to && prompt("Jours (ex: Monday,Friday — vide = tous) :");
+  if (!from || !to) return;
+  const res = await api("generate_missions_from_contract", {
+    contract, from_date: from, to_date: to,
+    days_of_week: days ? JSON.stringify(days.split(",").map(s => s.trim())) : null });
+  alert(res.count + " mission(s) créée(s)"); load();
+}
+
+load().catch(e => document.getElementById("np-main").innerHTML =
+  `<div class="np-card" style="color:var(--crit)">${e.message}</div>`);
+setInterval(load, 60000);   // live refresh
+</script>
+{% endblock %}
