@@ -1,0 +1,17 @@
+// hooks.py — add these lines to your app's hooks.py so the Print Studio
+// assets load on every Desk page (reporting pages included).
+// Python file, kept here as .txt for reference — merge into your hooks.py.
+
+app_include_js = [
+    "/assets/<your_app>/print-studio/qr-reference.js",
+    "/assets/<your_app>/print-studio/print-studio.js",
+]
+
+app_include_css = [
+    "/assets/<your_app>/print-studio/print-studio.css",
+]
+
+// Optional: also expose on the website portal
+// web_include_js = ["/assets/<your_app>/print-studio/qr-reference.js",
+//                   "/assets/<your_app>/print-studio/print-studio.js"]
+// web_include_css = ["/assets/<your_app>/print-studio/print-studio.css"]

@@ -31,11 +31,37 @@ docker compose -f pwd.yml -f compose.netplus.yaml exec -T backend ln -sfn /home/
 docker compose -f pwd.yml -f compose.netplus.yaml exec -T frontend ln -sfn /home/frappe/frappe-bench/apps/netplus/netplus/public /home/frappe/frappe-bench/assets/netplus >nul 2>&1
 
 echo.
-echo [+] Le serveur local tourne sur : http://localhost:8080/netplus-login
+echo [+] Backend ERPNext disponible sur : http://localhost:8080
 echo.
 
-:: 2. Open browser locally (optional, but convenient)
-start http://localhost:8080/netplus-login
+:: 2. Launch Net Plus Desk (Next.js frontend) in a separate window
+echo [+] Demarrage du frontend Net Plus Desk...
+cd /d "%~dp0netplus-desk"
+
+:: Create .env from example if missing
+IF NOT EXIST ".env" (
+    echo [netplus-desk] Creation du .env depuis .env.example...
+    copy ".env.example" ".env" >nul
+)
+
+:: Clean stale .next cache and rogue lockfiles that cause EINVAL on Windows/OneDrive
+echo [+] Nettoyage du cache Next.js (.next) et des lockfiles parasites...
+IF EXIST ".next" (
+    rmdir /s /q ".next" >nul 2>&1
+    echo     Cache .next supprime.
+)
+IF EXIST "C:\Users\%USERNAME%\yarn.lock" (
+    del /f /q "C:\Users\%USERNAME%\yarn.lock" >nul 2>&1
+    echo     yarn.lock parasite supprime.
+)
+
+:: Start Next.js in a new window (keeps this window free for the tunnel)
+start "Net Plus Desk" cmd /k "npm run dev"
+
+:: Wait a few seconds for Next.js to boot, then open the browser
+echo [+] Ouverture du navigateur dans 10 secondes (attente du demarrage Next.js)...
+timeout /t 10 /nobreak >nul
+start http://localhost:3000/login
 
 :: 3. Start Public Tunnel
 cd /d "%~dp0"

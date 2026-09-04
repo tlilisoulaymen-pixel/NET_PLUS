@@ -1,0 +1,19 @@
+{
+  "Sidebar": {
+    "version": "Net Plus Desk · v1.0"
+  },
+  "Desk": {
+    "allModules": "Todos os módulos",
+    "favorites": "Favoritos",
+    "noFavorites": "Ainda não há favoritos — passe o mouse sobre um módulo e clique na estrela ★ para fixá-lo aqui.",
+    "removeFromFavorites": "Remover dos favoritos",
+    "addToFavorites": "Adicionar aos favoritos"
+  },
+  "Topbar": {
+    "searchPlaceholder": "Pesquisar ou digitar um comando...",
+    "searchShortcut": "Ctrl K",
+    "notifications": "Notificações",
+    "settings": "Configurações",
+    "logout": "Sair"
+  }
+}

@@ -1,0 +1,16 @@
+// hooks.py — add these lines to your app's hooks.py so the Analytics Hub
+// assets load on every Desk page. Python file, kept as .txt — merge into hooks.py.
+
+app_include_js = [
+    "/assets/<your_app>/analytics-hub/analytics-dashboard.js",
+]
+
+app_include_css = [
+    "/assets/<your_app>/analytics-hub/analytics-dashboard.css",
+]
+
+// Register the dashboard as a Desk page (creates /app/analytics-hub):
+//   pages = {"analytics-hub": ...} is NOT needed — Frappe auto-discovers the
+//   standard page bundle when you add the page via:
+//     <your_app>/<your_app>/page/analytics_hub/analytics_hub.json + .js + .css
+//   OR simply drop the client/ page folder provided in this ZIP into your app.

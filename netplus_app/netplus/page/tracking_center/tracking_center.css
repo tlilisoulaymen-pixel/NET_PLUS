@@ -1,0 +1,2 @@
+/* tracking_center page-level overrides (main styles in tracking-center.css). */
+[data-page-route="tracking-center"] .layout-main-section { padding: 0; }

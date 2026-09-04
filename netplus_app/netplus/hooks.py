@@ -38,6 +38,15 @@ doc_events = {
     "Location": {
         "before_save": "netplus.utils.geo.geocode_location_if_needed",
     },
+    # Mission events
+    "Mission": {
+        "on_submit": "netplus.mission_api.on_mission_submit",
+        "validate": "netplus.mission_api.validate_mission",
+    },
+    "User": {
+        "after_insert": "netplus.admin_api.ensure_employee_for_user",
+        "on_update": "netplus.admin_api.ensure_employee_for_user",
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -67,7 +76,28 @@ after_install = "netplus.install.after_install"
 # Desk Custom Icons
 # ---------------------------------------------------------------------------
 app_include_icons = ["netplus/public/icons/netplus_icons.svg"]
-app_include_js = ["/assets/netplus/js/netplus_icons.js"]
+app_include_js = [
+    "/assets/netplus/js/netplus_icons.js",
+    # Print Studio — WYSIWYG template designer (appended to all Desk pages)
+    "/assets/netplus/print-studio/qr-reference.js",
+    "/assets/netplus/print-studio/print-studio.js",
+    # Analytics Hub — dashboard (loaded on analytics-hub page only via page bundle)
+    "/assets/netplus/analytics-hub/analytics-dashboard.js",
+    # Doc Flow Add-on
+    "/assets/netplus/doc-flow/doc-flow.js",
+    # Tracking Center Add-on
+    "/assets/netplus/tracking-center/tracking-center.js",
+]
+app_include_css = [
+    # Print Studio styles (namespaced .ps-* — no clash with Desk)
+    "/assets/netplus/print-studio/print-studio.css",
+    # Analytics Hub styles (namespaced .ah-*)
+    "/assets/netplus/analytics-hub/analytics-dashboard.css",
+    # Doc Flow Add-on
+    "/assets/netplus/doc-flow/doc-flow.css",
+    # Tracking Center Add-on
+    "/assets/netplus/tracking-center/tracking-center.css",
+]
 
 after_migrate = ["netplus.setup.workspace_icons.apply"]
 

@@ -1150,6 +1150,15 @@ window.addEventListener("hashchange", onRoute);
   }
   startWatch();
   if (S.boot.active) startHeartbeat();
+
+  if (window.io) {
+    const socket = io();
+    socket.on("new_mission", async (data) => {
+      toast("Nouvelle mission assignée : " + data.title, false);
+      haptic([200, 100, 200]);
+      try { await reloadBoot(); onRoute(); } catch (e) {}
+    });
+  }
   if (!location.hash) location.hash = "#/home";
   onRoute();
 })();

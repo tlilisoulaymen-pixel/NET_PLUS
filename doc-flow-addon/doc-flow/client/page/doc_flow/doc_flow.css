@@ -1,0 +1,2 @@
+/* doc_flow page-level overrides (main styles in doc-flow.css). */
+[data-page-route="doc_flow"] .layout-main-section { padding: 0; }

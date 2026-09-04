@@ -1,0 +1,89 @@
+/* Print Studio — subsection + designer styles.
+   Namespaced with .ps-* so it cannot clash with Desk / ERPNext styles. */
+
+.ps-section {
+  margin: 12px 0;
+  border: 1px solid var(--border-color, #d1d8dd);
+  border-radius: 6px;
+  background: var(--card-bg, #fff);
+}
+.ps-section-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; cursor: pointer; user-select: none;
+  font-weight: 600; font-size: 13px;
+  border-bottom: 1px solid transparent;
+}
+.ps-section-head:hover { background: var(--fg-hover-color, #f7fafc); }
+.ps-section-body { padding: 12px 14px; }
+
+.ps-toolbar {
+  display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+  padding: 6px; margin-bottom: 8px;
+  border: 1px solid var(--border-color, #d1d8dd);
+  border-radius: 4px; background: var(--control-bg, #f4f5f6);
+}
+.ps-btn {
+  padding: 3px 8px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border-color, #d1d8dd);
+  border-radius: 3px; background: #fff;
+}
+.ps-btn:hover { background: #eef1f4; }
+.ps-primary {
+  background: var(--primary, #2490ef); color: #fff;
+  border-color: var(--primary, #2490ef);
+}
+.ps-select, .ps-input {
+  padding: 3px 6px; font-size: 12px;
+  border: 1px solid var(--border-color, #d1d8dd);
+  border-radius: 3px; background: #fff;
+}
+.ps-color { width: 28px; height: 24px; padding: 0; border: none; background: none; }
+.ps-field-select { max-width: 160px; }
+
+.ps-split { display: flex; gap: 12px; }
+.ps-pane { flex: 1; min-width: 0; }
+.ps-pane-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--text-muted, #8d99a6); margin-bottom: 4px;
+}
+.ps-editor, .ps-preview {
+  min-height: 220px; max-height: 480px; overflow: auto;
+  padding: 12px; font-size: 13px;
+  border: 1px solid var(--border-color, #d1d8dd);
+  border-radius: 4px; background: #fff;
+}
+.ps-editor:focus { outline: 2px solid var(--primary, #2490ef); outline-offset: -1px; }
+.ps-editor:empty::before {
+  content: attr(data-placeholder); color: #b7c0c9;
+}
+.ps-preview { background: var(--control-bg, #fafbfc); }
+
+.ps-field {
+  background: #e8f2fd; border-radius: 3px; padding: 0 4px;
+  font-family: monospace; font-size: 12px; color: #1a6fbf;
+}
+.ps-qr-slot {
+  display: inline-block; padding: 6px 10px;
+  border: 1px dashed #8d99a6; border-radius: 4px;
+  font-size: 11px; color: #5e6a75; background: #f4f5f6;
+}
+.ps-qr-render img, .ps-qr-render canvas { display: block; width: 96px; height: 96px; }
+
+.ps-tbl { width: 100%; border-collapse: collapse; }
+.ps-tbl th, .ps-tbl td { border: 1px solid #d1d8dd; padding: 4px 6px; }
+
+.ps-actions {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  margin-top: 10px;
+}
+.ps-status { margin-top: 8px; font-size: 12px; min-height: 16px; }
+.ps-ok { color: #2a9d5c; }
+.ps-err { color: #d64545; }
+
+@media (max-width: 900px) { .ps-split { flex-direction: column; } }
+
+/* Print output */
+body.ps-print { font-family: Arial, Helvetica, sans-serif; margin: 24px; }
+@media print {
+  .ps-toolbar, .ps-actions, .ps-section-head, .ps-status { display: none !important; }
+}

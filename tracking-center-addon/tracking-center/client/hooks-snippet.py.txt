@@ -1,0 +1,9 @@
+// hooks.py — merge into your app's hooks.py (replace <your_app>).
+
+app_include_js = [
+    "/assets/<your_app>/tracking-center/tracking-center.js",
+]
+
+app_include_css = [
+    "/assets/<your_app>/tracking-center/tracking-center.css",
+]

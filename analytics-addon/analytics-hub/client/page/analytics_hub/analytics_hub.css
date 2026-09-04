@@ -1,0 +1,3 @@
+/* analytics_hub.css — page-level overrides only (main styles live in
+   analytics-dashboard.css, loaded via app_include_css). */
+[data-page-route="analytics-hub"] .layout-main-section { padding: 0; }

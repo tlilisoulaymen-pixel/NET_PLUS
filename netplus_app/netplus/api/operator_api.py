@@ -343,108 +343,20 @@ def bootstrap():
 @frappe.whitelist()
 def check_in(task, lat, lng, accuracy):
     _require_operator()
-    cfg = _settings()
-    lat, lng, accuracy = _validate_gps(lat, lng, accuracy, cfg.max_accuracy)
-
-    doc, doctype = _get_task_doc(task)
-    row = _my_row(doc)
-    if row.get(FIELD["mo_checkin"]) and not row.get(FIELD["mo_checkout"]):
-        frappe.throw(_("Vous avez déjà pointé sur cette mission."))
-
-    site = _site_geo_for_doc(doc, doctype)
-    dist = haversine_m(lat, lng, site.lat, site.lng) if (site and site.lat and site.lng) else 0
-    if site and site.radius and dist > site.radius:
-        # Si rayon configuré et hors zone
-        pass  # allow or enforce based on setting
-
-    now = now_datetime()
-    frappe.db.set_value("Mission Operator", row.name, {
-        FIELD["mo_checkin"]: now,
-        FIELD["mo_in_lat"]: lat,
-        FIELD["mo_in_lng"]: lng,
-        FIELD["mo_in_acc"]: accuracy,
-        FIELD["mo_hb_time"]: now,
-        FIELD["mo_hb_lat"]: lat,
-        FIELD["mo_hb_lng"]: lng,
-        FIELD["mo_oz_since"]: None,
-        FIELD["mo_oz_alerted"]: 0,
-    }, update_modified=False)
-
-    if doctype == "Mission":
-        frappe.db.set_value("Mission", task, "mission_status", "En cours", update_modified=False)
-    elif doc.status == "Open":
-        frappe.db.set_value("Task", task, "status", "Working", update_modified=False)
-
-    frappe.publish_realtime(
-        "netplus_mission",
-        {"event": "check_in", "task": task, "operator": frappe.session.user},
-        after_commit=True,
-    )
-    return {"ok": True, "time": str(now), "distance_m": round(dist, 1)}
+    from netplus.mission_api import record_checkin
+    res = record_checkin(task, lat, lng, "check_in")
+    return {"ok": True, "time": str(now_datetime()), "distance_m": round(res["distance"], 1)}
 
 
 @frappe.whitelist()
 def check_out(task, lat, lng, accuracy):
     _require_operator()
-    cfg = _settings()
-    lat, lng, accuracy = _validate_gps(lat, lng, accuracy, cfg.max_accuracy)
-
-    doc, doctype = _get_task_doc(task)
-    row = _my_row(doc)
-    checkin = row.get(FIELD["mo_checkin"])
-    if not checkin:
-        frappe.throw(_("Aucun check-in actif sur cette mission."))
-    if row.get(FIELD["mo_checkout"]):
-        frappe.throw(_("Cette mission est déjà terminée."))
-
-    site = _site_geo_for_doc(doc, doctype)
-    dist = haversine_m(lat, lng, site.lat, site.lng) if (site and site.lat and site.lng) else 0
-    out_of_zone = dist > site.radius if (site and site.radius) else False
-
-    now = now_datetime()
-    duration_s = time_diff_in_seconds(now, get_datetime(checkin))
-    frappe.db.set_value("Mission Operator", row.name, {
-        FIELD["mo_checkout"]: now,
-        FIELD["mo_out_lat"]: lat,
-        FIELD["mo_out_lng"]: lng,
-        FIELD["mo_out_acc"]: accuracy,
-        FIELD["mo_out_flag"]: 1 if out_of_zone else 0,
-    }, update_modified=False)
-
-    if doctype == "Mission":
-        # Check if ALL operators on this mission have now checked out
-        m_doc = frappe.get_doc("Mission", task)
-        all_checked_out = all(
-            bool(op.get(FIELD["mo_checkout"]))
-            for op in m_doc.get(FIELD["task_operators"]) or []
-        )
-        new_status = "Terminée" if all_checked_out else "En cours"
-        frappe.db.set_value("Mission", task, "mission_status", new_status, update_modified=False)
-    else:
-        frappe.db.set_value("Task", task, "status", "Completed", update_modified=False)
-
-    # Checkout hors zone : autorisé mais signalé au superviseur
-    if out_of_zone:
-        sup = _supervisor_user()
-        subj = getattr(doc, "subject", None) or getattr(doc, "customer", None) or task
-        _notify(
-            sup,
-            _("Checkout hors zone — {0}").format(subj),
-            _("{0} a terminé la mission {1} à {2} m du site (rayon {3} m).")
-            .format(frappe.session.user, task, cint(dist), cint(site.radius)),
-            doctype, task,
-        )
-
-    frappe.publish_realtime(
-        "netplus_mission",
-        {"event": "check_out", "task": task, "operator": frappe.session.user,
-         "out_of_zone": out_of_zone},
-        after_commit=True,
-    )
+    from netplus.mission_api import record_checkin
+    res = record_checkin(task, lat, lng, "check_out")
     return {
-        "ok": True, "time": str(now), "distance_m": round(dist, 1),
-        "out_of_zone": out_of_zone, "duration_s": cint(duration_s),
-        "check_in_time": str(checkin),
+        "ok": True, "time": str(now_datetime()), "distance_m": round(res["distance"], 1),
+        "out_of_zone": res["attendance_status"] == "Hors zone", "duration_s": 0,
+        "check_in_time": str(now_datetime()),
     }
 
 

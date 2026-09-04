@@ -1,0 +1,17 @@
+// hooks.py — merge into your app's hooks.py (replace <your_app>).
+// Loads Doc Flow (+ the two earlier add-ons) on every Desk page.
+
+app_include_js = [
+    // earlier add-ons (skip if already present)
+    "/assets/<your_app>/print-studio/qr-reference.js",
+    "/assets/<your_app>/print-studio/print-studio.js",
+    "/assets/<your_app>/analytics-hub/analytics-dashboard.js",
+    // this add-on
+    "/assets/<your_app>/doc-flow/doc-flow.js",
+]
+
+app_include_css = [
+    "/assets/<your_app>/print-studio/print-studio.css",
+    "/assets/<your_app>/analytics-hub/analytics-dashboard.css",
+    "/assets/<your_app>/doc-flow/doc-flow.css",
+]
