@@ -3,3 +3,7 @@
 __pycache__/
 node_modules/
 .next/
+
+# Installer build artifacts
+installer/payload/
+installer/dist/*.exe
