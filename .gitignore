@@ -1,0 +1,5 @@
+
+# Auto-added by cleanup
+__pycache__/
+node_modules/
+.next/
