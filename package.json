@@ -1,0 +1,36 @@
+{
+  "name": "netplus-desk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Net Plus Desk — modern frontend for ERPNext / Frappe",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.62.0",
+    "clsx": "^2.1.1",
+    "cobe": "^2.0.1",
+    "dayjs": "^1.11.13",
+    "framer-motion": "^13.1.0",
+    "lucide-react": "^0.469.0",
+    "next": "^15.1.0",
+    "next-intl": "^4.13.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.0",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0"
+  }
+}

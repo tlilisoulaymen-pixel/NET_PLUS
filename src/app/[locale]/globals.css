@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Layout tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --sidebar-width: 304px;
+  --sidebar-collapsed: 128px;
+  --topbar-height: 64px;
+
+  /* accent colour (overridden by ThemeProvider via JS) */
+  --accent: #4169E1;
+  --accent-rgb: 65 105 225;
+}
+
+/* ── Light mode surfaces ───────────────────────────────────────────────────── */
+:root {
+  --bg-app:      #F6F7FB;
+  --bg-surface:  #FFFFFF;
+  --bg-muted:    #F0F3F8;
+  --bg-sidebar:  #0D1630;
+  --bg-hover:    #EEF2FF;
+
+  --ink-heading: #111827;
+  --ink-primary: #263247;
+  --ink-secondary: #667085;
+  --ink-muted:   #98A2B3;
+
+  --line:        #E4E8F0;
+  --line-strong: #D5DAE4;
+}
+
+/* ── Dark mode surfaces ────────────────────────────────────────────────────── */
+html.dark {
+  --bg-app:      #0F1117;
+  --bg-surface:  #1C1F2A;
+  --bg-muted:    #252834;
+  --bg-sidebar:  #090C16;
+  --bg-hover:    #252834;
+
+  --ink-heading: #F1F5F9;
+  --ink-primary: #CBD5E1;
+  --ink-secondary: #8B98B8;
+  --ink-muted:   #4B5A77;
+
+  --line:        #2C3247;
+  --line-strong: #374060;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-app);
+  color: var(--ink-primary);
+  font-feature-settings: "tnum" 1, "cv03" 1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body { @apply antialiased; }
+
+h1 { @apply text-[28px] leading-9 font-bold tracking-[-0.02em]; color: var(--ink-heading); }
+h2 { @apply text-lg leading-[26px] font-semibold; color: var(--ink-heading); }
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* ── Accent colour utilities (driven by CSS var) ───────────────────────────── */
+.accent-bg  { background-color: var(--accent); }
+.accent-text { color: var(--accent); }
+.accent-border { border-color: var(--accent); }
+.accent-ring  { box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.2); }
+
+/* ── Focus ring ────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.25);
+  border-radius: 8px;
+}
+
+/* ── Transition for theme switch ───────────────────────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
