@@ -11,9 +11,10 @@ namespace NetPlusLauncher
 {
     static class Config
     {
-        public const string APP_URL      = "http://localhost:8080";
-        public const string APP_TITLE    = "NetPlus";
-        public const string COMPOSE_DIR  = "frappe_docker";
+        public const string APP_URL        = "http://localhost:8080/app";  // ERPNext login page
+        public const string HEALTH_URL     = "http://localhost:8080";      // no-auth health check
+        public const string APP_TITLE      = "NetPlus";
+        public const string COMPOSE_DIR    = "frappe_docker";
     }
 
     static class Program
@@ -73,6 +74,9 @@ namespace NetPlusLauncher
 
             _tray.DoubleClick += OnOpen;
 
+            // Show an immediate balloon so user sees the tray icon right away
+            Balloon("NetPlus demarre en arriere-plan...", ToolTipIcon.Info);
+
             // Start background worker
             var t = new Thread(StartupSequence) { IsBackground = true };
             t.Start();
@@ -120,7 +124,7 @@ namespace NetPlusLauncher
                 SetStatus("Attente de l'application...");
                 for (int i = 0; i < 60; i++)
                 {
-                    if (AppOnline()) break;
+                    if (AppOnline(Config.HEALTH_URL)) break;
                     Thread.Sleep(5000);
                 }
 
@@ -233,11 +237,12 @@ namespace NetPlusLauncher
             }
         }
 
-        static bool AppOnline()
+        static bool AppOnline(string url = null)
         {
+            if (url == null) url = Config.HEALTH_URL;
             try
             {
-                var req = (HttpWebRequest)WebRequest.Create(Config.APP_URL);
+                var req = (HttpWebRequest)WebRequest.Create(url);
                 req.Timeout = 3000;
                 req.Method  = "HEAD";
                 using (req.GetResponse()) return true;
