@@ -35,10 +35,58 @@ if (-not $wslOk) {
 # ------------------------------------------------------------
 # 2. Docker Desktop
 # ------------------------------------------------------------
-Write-Step "Vérification de Docker Desktop..."
-$dockerExe  = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
-$dockerCLI  = Get-Command docker -ErrorAction SilentlyContinue
-$dockerInstalled = (Test-Path $dockerExe) -or ($dockerCLI -ne $null)
+Write-Step "Verification de Docker Desktop..."
+$dockerExe       = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+$dockerRegKey    = "HKLM:\SOFTWARE\Docker Inc.\Docker Desktop"
+$dockerInstalled = Test-Path $dockerExe
+
+# --- Detect broken install: registry key present but exe missing, or key malformed ---
+$dockerBroken = $false
+if (-not $dockerInstalled -and (Test-Path $dockerRegKey)) {
+    Write-Host "Installation Docker Desktop corrompue detectee (cle registre orpheline)."
+    $dockerBroken = $true
+}
+if ($dockerInstalled) {
+    # Verify registry key has a valid backend path
+    try {
+        $backendPath = (Get-ItemProperty $dockerRegKey -ErrorAction Stop).Path
+        if (-not (Test-Path $backendPath)) {
+            Write-Host "Cle registre Docker Desktop pointe vers un chemin invalide: $backendPath"
+            $dockerBroken = $true
+        }
+    } catch {
+        Write-Host "Cle registre Docker Desktop manquante ou illisible."
+        $dockerBroken = $true
+    }
+}
+
+# --- Repair: clean up orphaned registry keys ---
+if ($dockerBroken) {
+    Write-Step "Nettoyage des entrees de registre Docker Desktop corrompues..."
+    $regPaths = @(
+        "HKLM:\SOFTWARE\Docker Inc.",
+        "HKLM:\SOFTWARE\WOW6432Node\Docker Inc.",
+        "HKCU:\SOFTWARE\Docker Inc."
+    )
+    foreach ($rp in $regPaths) {
+        if (Test-Path $rp) {
+            Remove-Item $rp -Recurse -Force -ErrorAction SilentlyContinue
+            Write-Host "  Supprime: $rp"
+        }
+    }
+
+    # If exe is also missing, mark for fresh install
+    if (-not $dockerInstalled) { $dockerInstalled = $false }
+    else {
+        # Exe exists but registry was broken — uninstall and reinstall cleanly
+        Write-Step "Desinstallation de Docker Desktop (installation corrompue)..."
+        $uninst = "C:\Program Files\Docker\Docker\Docker Desktop Installer.exe"
+        if (Test-Path $uninst) {
+            Start-Process -Wait -FilePath $uninst -ArgumentList "uninstall", "--quiet"
+        }
+        $dockerInstalled = $false
+    }
+}
 
 if (-not $dockerInstalled) {
     Write-Step "Installation de Docker Desktop..."
@@ -47,7 +95,7 @@ if (-not $dockerInstalled) {
         winget install --id Docker.DockerDesktop -e --silent `
             --accept-package-agreements --accept-source-agreements
     } else {
-        Write-Step "winget indisponible — téléchargement direct de Docker Desktop..."
+        Write-Step "winget indisponible - telechargement direct de Docker Desktop..."
         $installer = Join-Path $env:TEMP "DockerDesktopInstaller.exe"
         Invoke-WebRequest `
             -Uri "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe" `
@@ -56,21 +104,39 @@ if (-not $dockerInstalled) {
             -ArgumentList "install", "--quiet", "--accept-license"
         Remove-Item $installer -Force -ErrorAction SilentlyContinue
     }
-    Write-Host "Docker Desktop installé."
+    Write-Host "Docker Desktop installe."
 } else {
-    Write-Host "Docker Desktop déjà installé."
+    Write-Host "Docker Desktop deja installe et operationnel."
+}
+
+# --- Post-install: ensure registry key is present and valid ---
+if (Test-Path $dockerExe) {
+    $backendDir = "C:\Program Files\Docker\Docker\resources"
+    $backend    = Join-Path $backendDir "com.docker.backend.exe"
+    if (-not (Test-Path $dockerRegKey)) {
+        Write-Step "Creation de la cle de registre Docker Desktop manquante..."
+        New-Item -Path $dockerRegKey -Force | Out-Null
+    }
+    try {
+        $existing = (Get-ItemProperty $dockerRegKey -ErrorAction Stop).Path
+    } catch { $existing = $null }
+    if (-not $existing -or -not (Test-Path $existing)) {
+        if (Test-Path $backend) {
+            Set-ItemProperty -Path $dockerRegKey -Name "Path" -Value $backend -Force
+            Write-Host "  Cle registre reparee: $backend"
+        }
+    }
 }
 
 # ------------------------------------------------------------
 # 3. Start Docker Desktop and wait for the engine
 # ------------------------------------------------------------
-Write-Step "Démarrage du moteur Docker..."
+Write-Step "Demarrage du moteur Docker..."
 if (Test-Path $dockerExe) {
-    # Launch Docker Desktop if not already running
     $running = Get-Process "Docker Desktop" -ErrorAction SilentlyContinue
     if (-not $running) {
         Start-Process -FilePath $dockerExe
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 15   # give it time to start the backend
     }
 
     $tries = 0
@@ -82,11 +148,11 @@ if (Test-Path $dockerExe) {
     }
 
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Moteur Docker opérationnel."
+        Write-Host "Moteur Docker operationnel."
     } else {
-        Write-Host "Docker n'a pas démarré dans le délai imparti."
-        Write-Host "Un redémarrage Windows est peut-être nécessaire."
-        Write-Host "Relancez ensuite NetPlus via l'icône du bureau."
+        Write-Host "Docker n'a pas demarre dans le delai imparti."
+        Write-Host "Un redemarrage Windows est peut-etre necessaire."
+        Write-Host "Relancez ensuite NetPlus via l'icone du bureau."
     }
 }
 

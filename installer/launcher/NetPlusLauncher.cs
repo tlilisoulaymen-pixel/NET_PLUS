@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 
@@ -112,8 +113,11 @@ namespace NetPlusLauncher
                 if (!EngineRunning(dockerCli))
                 {
                     SetStatus("Demarrage de Docker Desktop...");
+                    // Repair registry before launching — prevents 'cannot find registry key' crash
+                    RepairDockerRegistry();
                     if (dockerDesktop != null)
                         Process.Start(new ProcessStartInfo(dockerDesktop) { UseShellExecute = true });
+                    Thread.Sleep(5000); // let the backend initialise
                 }
 
                 SetStatus("Attente du moteur Docker...");
@@ -355,6 +359,40 @@ namespace NetPlusLauncher
                 using (req.GetResponse()) return true;
             }
             catch { return false; }
+        }
+
+        // Fix "cannot find registry key" Docker Desktop error on client machines
+        static void RepairDockerRegistry()
+        {
+            try
+            {
+                const string keyPath = @"SOFTWARE\Docker Inc.\Docker Desktop";
+                string[] backendCandidates = {
+                    @"C:\Program Files\Docker\Docker\resources\com.docker.backend.exe",
+                    @"C:\Program Files\Docker\Docker\resources\dockerd.exe",
+                };
+
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(keyPath, writable: true)
+                    ?? Registry.LocalMachine.CreateSubKey(keyPath))
+                {
+                    if (key == null) return;
+
+                    object existing = key.GetValue("Path");
+                    bool valid = existing != null && File.Exists(existing.ToString());
+                    if (!valid)
+                    {
+                        foreach (string c in backendCandidates)
+                        {
+                            if (File.Exists(c))
+                            {
+                                key.SetValue("Path", c);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { /* registry repair is best-effort */ }
         }
 
         // Open in Edge (or Chrome) app mode — no address bar, no tabs, native app look
