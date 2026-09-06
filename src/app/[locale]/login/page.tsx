@@ -215,9 +215,11 @@ export default function LoginPage() {
       if (homePage === "/desk" || homePage.startsWith("/desk/") || homePage === "app" || homePage === "/app") {
         router.replace("/desk");
       } else {
-        // If it's a PWA (like /netplus-client, /netplus-pwa), redirect to the backend app
-        // Add a leading slash if missing to make it an absolute path
-        window.location.href = homePage.startsWith("/") ? homePage : `/${homePage}`;
+        // PWA routes (/netplus-pwa, /netplus-client, /netplus-supervision, /me, /app)
+        // are served by the Frappe backend, not by Vercel — redirect to the backend URL.
+        const backendUrl = process.env.NEXT_PUBLIC_FRAPPE_URL || "http://localhost:8080";
+        const path = homePage.startsWith("/") ? homePage : `/${homePage}`;
+        window.location.href = `${backendUrl}${path}`;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
