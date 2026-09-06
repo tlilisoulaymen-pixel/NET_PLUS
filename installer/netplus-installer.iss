@@ -72,9 +72,9 @@ Filename: "powershell.exe"; \
   StatusMsg: "Installation des prérequis (WSL2, Docker Desktop)… Cela peut prendre plusieurs minutes."; \
   Flags: waituntilterminated
 
-; Step 2 — offer to launch NetPlus right after install (silent .exe launcher)
+; Step 2 — always launch NetPlus right after install (checked by default in Inno Setup)
 Filename: "{app}\{#AppExeName}"; Description: "Lancer {#AppName} maintenant"; \
-  Flags: postinstall nowait skipifsilent
+  Flags: postinstall nowait
 
 [UninstallRun]
 ; Stop containers cleanly on uninstall

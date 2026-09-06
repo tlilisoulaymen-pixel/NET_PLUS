@@ -22,9 +22,21 @@ namespace NetPlusLauncher
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TrayApp());
+            // Single-instance guard — if already running, just open the browser and exit
+            bool createdNew;
+            using (var mutex = new Mutex(true, "NetPlusLauncherMutex_v1", out createdNew))
+            {
+                if (!createdNew)
+                {
+                    // Another instance is already running — just open the browser
+                    Process.Start(new ProcessStartInfo(Config.APP_URL) { UseShellExecute = true });
+                    return;
+                }
+
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new TrayApp());
+            }
         }
     }
 

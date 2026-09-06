@@ -91,6 +91,40 @@ if (Test-Path $dockerExe) {
     }
 }
 
+
 Write-Step "Prérequis terminés. Journal: $log"
+
+# ------------------------------------------------------------
+# 4. Node.js LTS (required by netplus-desk Next.js frontend)
+# ------------------------------------------------------------
+Write-Step "Vérification de Node.js..."
+$nodeOk = $false
+try {
+    $nodeVer = & node --version 2>&1
+    if ($LASTEXITCODE -eq 0) { $nodeOk = $true; Write-Host "Node.js déjà présent: $nodeVer" }
+} catch { }
+
+if (-not $nodeOk) {
+    Write-Step "Installation de Node.js LTS..."
+    $winget = Get-Command winget -ErrorAction SilentlyContinue
+    if ($winget) {
+        winget install --id OpenJS.NodeJS.LTS -e --silent `
+            --accept-package-agreements --accept-source-agreements
+    } else {
+        Write-Step "winget indisponible — téléchargement direct de Node.js..."
+        $nodeInstaller = Join-Path $env:TEMP "node-lts-installer.msi"
+        Invoke-WebRequest `
+            -Uri "https://nodejs.org/dist/lts/node-v20-x64.msi" `
+            -OutFile $nodeInstaller -UseBasicParsing
+        Start-Process msiexec.exe -Wait -ArgumentList "/i `"$nodeInstaller`" /qn"
+        Remove-Item $nodeInstaller -Force -ErrorAction SilentlyContinue
+    }
+    # Refresh PATH so npm is available immediately
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("PATH","User")
+    Write-Host "Node.js installé."
+}
+
+Write-Step "Tous les prérequis sont installés. Journal: $log"
 Stop-Transcript | Out-Null
 exit 0
