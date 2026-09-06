@@ -50,8 +50,7 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        {/* Web App Manifest — Edge/Chrome app mode uses this for window icon */}
-        <link rel="manifest" href="/manifest.json" />
+        {/* theme-color for Edge app mode title bar */}
         <meta name="theme-color" content="#0369a1" />
       </head>
       <body className="font-sans" suppressHydrationWarning>
