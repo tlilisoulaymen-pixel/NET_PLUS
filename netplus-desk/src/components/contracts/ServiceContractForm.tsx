@@ -83,7 +83,7 @@ export default function ServiceContractForm({ isNew = false }: { isNew?: boolean
     const cbName = "initGoogleMaps" + Date.now();
     (window as any)[cbName] = () => setMapsLoaded(true);
     const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=places,marker&callback=${cbName}`;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=marker&callback=${cbName}`;
     document.head.appendChild(s);
   }, []);
 
