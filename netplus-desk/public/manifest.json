@@ -1,0 +1,23 @@
+{
+  "name": "NetPlus",
+  "short_name": "NetPlus",
+  "description": "Modern ERP workspace powered by Frappe / ERPNext",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1426",
+  "theme_color": "#0369a1",
+  "icons": [
+    {
+      "src": "/logo-net-plus.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-net-plus.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

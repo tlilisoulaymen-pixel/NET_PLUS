@@ -7,12 +7,16 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Net Plus Desk", template: "%s · Net Plus Desk" },
+  title: { default: "NetPlus", template: "%s · NetPlus" },
   description: "Modern ERP workspace powered by Frappe / ERPNext",
+  manifest: "/manifest.json",
   icons: {
-    icon:             "/favicon.ico",
-    shortcut:         "/favicon.ico",
-    apple:            "/favicon.ico",
+    icon:    [
+      { url: "/logo-net-plus.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/logo-net-plus.png",
+    apple:    "/logo-net-plus.png",
   },
 };
 
@@ -46,6 +50,9 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* Web App Manifest — Edge/Chrome app mode uses this for window icon */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#0369a1" />
       </head>
       <body className="font-sans" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
