@@ -72,14 +72,14 @@ const blurClassMap: Record<BlurSize, string> = {
 
 function SmokeyBackground({
   backdropBlurAmount = "sm",
-  color = "#1E40AF", // Default dark blue
+  color = "#1E40AF",
   className = "",
 }: SmokeyBackgroundProps): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  // Use refs instead of state — no re-renders on mouse move
+  const mouseRef   = useRef({ x: 0, y: 0 });
+  const hoverRef   = useRef(false);
 
-  // Helper to convert hex color to RGB (0-1 range)
   const hexToRgb = (hex: string): [number, number, number] => {
     const r = parseInt(hex.substring(1, 3), 16) / 255;
     const g = parseInt(hex.substring(3, 5), 16) / 255;
@@ -92,10 +92,7 @@ function SmokeyBackground({
     if (!canvas) return;
 
     const gl = canvas.getContext("webgl");
-    if (!gl) {
-      console.error("WebGL not supported");
-      return;
-    }
+    if (!gl) return; // WebGL not supported — silently skip, CSS fallback shows
 
     const compileShader = (type: number, source: string): WebGLShader | null => {
       const shader = gl.createShader(type);
@@ -103,14 +100,13 @@ function SmokeyBackground({
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error("Shader compilation error:", gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
         return null;
       }
       return shader;
     };
 
-    const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSmokeySource);
+    const vertexShader   = compileShader(gl.VERTEX_SHADER,   vertexSmokeySource);
     const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSmokeySource);
     if (!vertexShader || !fragmentShader) return;
 
@@ -119,67 +115,75 @@ function SmokeyBackground({
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error("Program linking error:", gl.getProgramInfoLog(program));
-      return;
-    }
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
 
     gl.useProgram(program);
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
 
-    const positionLocation = gl.getAttribLocation(program, "a_position");
+    const positionLocation   = gl.getAttribLocation(program, "a_position");
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
     const iResolutionLocation = gl.getUniformLocation(program, "iResolution");
-    const iTimeLocation = gl.getUniformLocation(program, "iTime");
-    const iMouseLocation = gl.getUniformLocation(program, "iMouse");
-    const uColorLocation = gl.getUniformLocation(program, "u_color");
+    const iTimeLocation       = gl.getUniformLocation(program, "iTime");
+    const iMouseLocation      = gl.getUniformLocation(program, "iMouse");
+    const uColorLocation      = gl.getUniformLocation(program, "u_color");
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     const [r, g, b] = hexToRgb(color);
     gl.uniform3f(uColorLocation, r, g, b);
 
+    // Track last canvas size — only reset when dimensions change (avoid GPU flush every frame)
+    let lastW = 0, lastH = 0;
+    let rafId = 0;
+
     const render = () => {
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      canvas.width = width;
-      canvas.height = height;
-      gl.viewport(0, 0, width, height);
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (w !== lastW || h !== lastH) {
+        canvas.width  = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+        lastW = w; lastH = h;
+      }
 
-      const currentTime = (Date.now() - startTime) / 1000;
-
-      gl.uniform2f(iResolutionLocation, width, height);
-      gl.uniform1f(iTimeLocation, currentTime);
-      gl.uniform2f(iMouseLocation, isHovering ? mousePosition.x : width / 2, isHovering ? height - mousePosition.y : height / 2);
-
+      const t = (Date.now() - startTime) / 1000;
+      gl.uniform2f(iResolutionLocation, lastW, lastH);
+      gl.uniform1f(iTimeLocation, t);
+      gl.uniform2f(
+        iMouseLocation,
+        hoverRef.current ? mouseRef.current.x : lastW / 2,
+        hoverRef.current ? lastH - mouseRef.current.y : lastH / 2
+      );
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      requestAnimationFrame(render);
+      rafId = requestAnimationFrame(render);
     };
 
-    const handleMouseMove = (event: MouseEvent) => {
+    // Mouse events update refs — zero re-renders
+    const onMove  = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      setMousePosition({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+      mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-    const handleMouseEnter = () => setIsHovering(true);
-    const handleMouseLeave = () => setIsHovering(false);
+    const onEnter = () => { hoverRef.current = true; };
+    const onLeave = () => { hoverRef.current = false; };
 
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseenter", handleMouseEnter);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
+    canvas.addEventListener("mousemove",  onMove);
+    canvas.addEventListener("mouseenter", onEnter);
+    canvas.addEventListener("mouseleave", onLeave);
 
-    render();
+    rafId = requestAnimationFrame(render);
 
     return () => {
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseenter", handleMouseEnter);
-      canvas.removeEventListener("mouseleave", handleMouseLeave);
+      cancelAnimationFrame(rafId);            // ← clean stop, no zombie frames
+      canvas.removeEventListener("mousemove",  onMove);
+      canvas.removeEventListener("mouseenter", onEnter);
+      canvas.removeEventListener("mouseleave", onLeave);
+      gl.deleteProgram(program);
     };
-  }, [isHovering, mousePosition, color]);
+  }, [color]); // ← only re-init if color prop changes
 
   const finalBlurClass = blurClassMap[backdropBlurAmount as BlurSize] || blurClassMap["sm"];
 
