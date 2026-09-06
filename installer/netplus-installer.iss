@@ -1,4 +1,4 @@
-; ============================================================
+﻿; ============================================================
 ;  NetPlus — Inno Setup installer script
 ;  Compile with Inno Setup 6 (free): https://jrsoftware.org/isinfo.php
 ;  See README.md for the full build procedure.
@@ -9,7 +9,7 @@
 #define AppVersion "1.0.0"
 #define AppPublisher "NetPlus Technologies"
 #define AppURL "https://github.com/tlilisoulaymen-pixel/NET_PLUS"
-#define AppExeName "NetPlus-Launcher.bat"
+#define AppExeName "NetPlusLauncher.exe"
 
 [Setup]
 ; GUID identifies this product across all future upgrades — never change it.
@@ -46,11 +46,13 @@ Name: "autostart";   Description: "Lancer NetPlus au démarrage de Windows"; Gro
 
 [Files]
 ; Application payload (netplus_app, netplus-desk, frappe_docker, addons …)
-Source: "payload\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "payload\*";             DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 ; Installer support scripts
 Source: "install-prerequisites.ps1"; DestDir: "{app}\installer"; Flags: ignoreversion
-Source: "NetPlus-Launcher.bat";      DestDir: "{app}";           Flags: ignoreversion
+
+; Silent launcher executable (compiled C# WinForms tray app — no console window)
+Source: "launcher\NetPlusLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; Source: "netplus.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
@@ -71,9 +73,9 @@ Filename: "powershell.exe"; \
   StatusMsg: "Installation des prérequis (WSL2, Docker Desktop)… Cela peut prendre plusieurs minutes."; \
   Flags: waituntilterminated
 
-; Step 2 — offer to launch NetPlus right after install
+; Step 2 — offer to launch NetPlus right after install (silent .exe launcher)
 Filename: "{app}\{#AppExeName}"; Description: "Lancer {#AppName} maintenant"; \
-  Flags: postinstall nowait skipifsilent shellexec
+  Flags: postinstall nowait skipifsilent
 
 [UninstallRun]
 ; Stop containers cleanly on uninstall

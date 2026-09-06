@@ -9,12 +9,38 @@ $repoRoot   = Split-Path $scriptDir -Parent
 $payloadDir = Join-Path $scriptDir "payload"
 $issFile    = Join-Path $scriptDir "netplus-installer.iss"
 $distDir    = Join-Path $scriptDir "dist"
+$launcherCs = Join-Path $scriptDir "launcher\NetPlusLauncher.cs"
+$launcherExe= Join-Path $scriptDir "launcher\NetPlusLauncher.exe"
 
 function Write-Step($msg)  { Write-Host "" ; Write-Host "==> $msg" -ForegroundColor Cyan }
 function Write-Ok($msg)    { Write-Host "    OK  $msg" -ForegroundColor Green }
 function Write-Warn($msg)  { Write-Host "    !!  $msg" -ForegroundColor Yellow }
 function Write-Err($msg)   { Write-Host "    XX  $msg" -ForegroundColor Red; exit 1 }
 
+# -------------------------------------------------------
+# 1. Compile the C# silent launcher
+# -------------------------------------------------------
+Write-Step "Compiling silent launcher (NetPlusLauncher.exe)..."
+$csc = @(
+    "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe",
+    "C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+if (-not $csc) { Write-Err "csc.exe not found. .NET Framework 4 is required." }
+
+& $csc /nologo /target:winexe /optimize+ /out:"$launcherExe" `
+    /reference:"System.Windows.Forms.dll" `
+    /reference:"System.Drawing.dll" `
+    /reference:"System.dll" `
+    "$launcherCs" 2>&1 | Where-Object { $_ -match "error" } | ForEach-Object { Write-Warn $_ }
+
+if ($LASTEXITCODE -ne 0) { Write-Err "Launcher compilation failed." }
+$size = [math]::Round((Get-Item $launcherExe).Length / 1KB, 1)
+Write-Ok "NetPlusLauncher.exe compiled ($size KB)"
+
+# -------------------------------------------------------
+# 2. Check / install Inno Setup
+# -------------------------------------------------------
 Write-Step "Checking Inno Setup 6..."
 $iscc = @(
     "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
@@ -22,21 +48,14 @@ $iscc = @(
 ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
 if (-not $iscc) {
-    Write-Warn "Inno Setup 6 not found. Trying winget..."
-    $winget = Get-Command winget -ErrorAction SilentlyContinue
-    if ($winget) {
-        winget install --id JRSoftware.InnoSetup -e --silent --accept-package-agreements --accept-source-agreements
-        $iscc = @(
-            "C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
-            "C:\Program Files\Inno Setup 6\ISCC.exe"
-        ) | Where-Object { Test-Path $_ } | Select-Object -First 1
-    }
-    if (-not $iscc) {
-        Write-Err "Inno Setup 6 not found. Install: https://jrsoftware.org/isinfo.php"
-    }
+    Write-Warn "Inno Setup 6 not found. Install: https://jrsoftware.org/isinfo.php"
+    Write-Err "Inno Setup required to continue."
 }
 Write-Ok "Inno Setup: $iscc"
 
+# -------------------------------------------------------
+# 3. Build payload/
+# -------------------------------------------------------
 if (-not $SkipPayload) {
     Write-Step "Building payload/..."
     $include = @(
@@ -69,6 +88,9 @@ if (-not $SkipPayload) {
     Write-Warn "-SkipPayload set - skipping payload copy."
 }
 
+# -------------------------------------------------------
+# 4. Compile installer
+# -------------------------------------------------------
 Write-Step "Compiling installer..."
 New-Item -ItemType Directory -Path $distDir -Force | Out-Null
 
@@ -79,13 +101,18 @@ $issContent = $issContent -replace '#define AppVersion "[\d\.]+"', ('#define App
 & $iscc $issFile
 if ($LASTEXITCODE -ne 0) { Write-Err "Compilation failed (exit code $LASTEXITCODE)." }
 
+# -------------------------------------------------------
+# 5. Report
+# -------------------------------------------------------
 $exe = Get-ChildItem $distDir -Filter "*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($exe) {
     $sizeMB = [math]::Round($exe.Length / 1MB, 1)
     Write-Step "Installer ready!"
     Write-Ok "File : $($exe.FullName)"
     Write-Ok "Size : ${sizeMB} MB"
+    Write-Host ""
     Write-Host "  Ship this file to your customers." -ForegroundColor White
+    Write-Host "  Tip: sign it with signtool to avoid SmartScreen warnings." -ForegroundColor Yellow
 } else {
     Write-Err "No .exe found in dist/."
 }
