@@ -222,19 +222,18 @@ export default function LoginPage() {
       });
       const roles = roleRows.map((r) => r.role);
 
-      const backendUrl = process.env.NEXT_PUBLIC_FRAPPE_URL || "https://drown-cube-undivided.ngrok-free.dev";
-
+      // All PWA routes (/netplus-pwa, /netplus-supervision, /netplus-client)
+      // are proxied by Next.js rewrites → same Vercel domain → session cookie works.
       // Mirror the logic in netplus/auth.py → get_home_for()
       if (roles.includes("System Manager") || roles.includes("Administrator")) {
         router.replace("/desk");
       } else if (roles.includes("NetPlus Operator")) {
-        window.location.href = `${backendUrl}/netplus-pwa`;
+        window.location.href = "/netplus-pwa";
       } else if (roles.includes("NetPlus Supervisor")) {
-        window.location.href = `${backendUrl}/netplus-supervision`;
+        window.location.href = "/netplus-supervision";
       } else if (roles.includes("NetPlus Client")) {
-        window.location.href = `${backendUrl}/netplus-client`;
+        window.location.href = "/netplus-client";
       } else {
-        // Fallback: desk for any other authenticated user
         router.replace("/desk");
       }
     } catch (err) {
