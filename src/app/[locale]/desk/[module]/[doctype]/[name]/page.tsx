@@ -41,7 +41,7 @@ export default function DocPage({
   const mod = getModule(moduleSlug);
 
   if (doctype === "Mission") return <MissionForm isNew={isNew} docName={isNew ? undefined : name} />;
-  if (doctype === "Service Contract") return <ServiceContractForm isNew={isNew} docName={isNew ? undefined : name} />;
+  if (doctype === "Service Contract") return <ServiceContractForm isNew={isNew} />;
 
   const meta = useMeta(doctype);
   const doc = useDoc(doctype, isNew ? undefined : name);
@@ -91,7 +91,7 @@ export default function DocPage({
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <h1>{isNew ? `New ${doctype}` : name}</h1>
-          {statusLabel && <StatusBadge label={statusLabel} tone={docstatus === 1 ? "success" : docstatus === 2 ? "critical" : "warning"} />}
+          {statusLabel && <StatusBadge label={statusLabel} tone={docstatus === 1 ? "success" : docstatus === 2 ? "danger" : "warning"} />}
         </div>
         
         <div className="flex items-center gap-2">
