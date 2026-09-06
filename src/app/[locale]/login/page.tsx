@@ -207,19 +207,42 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await frappe.login(usr, pwd);
-      
-      const homePage = res.home_page || "/desk";
-      
-      // If it's the ERP desk, route internally in Next.js
-      if (homePage === "/desk" || homePage.startsWith("/desk/") || homePage === "app" || homePage === "/app") {
+      await frappe.login(usr, pwd);
+
+      // After login, fetch the user's roles and apply role-based routing.
+      // We cannot trust Frappe's home_page field because users with the
+      // "Employee" role have desk_access=1 and Frappe returns "/desk" for them
+      // even when they are NetPlus Operators/Supervisors/Clients.
+      const sessionRes = await frappe.call({
+        method: "frappe.auth.get_logged_user",
+      });
+      const loggedUser = sessionRes.message;
+
+      const rolesRes = await frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+          doctype: "Has Role",
+          filters: [["parent", "=", loggedUser]],
+          fields: ["role"],
+          limit: 50,
+        },
+      });
+      const roles: string[] = (rolesRes.message || []).map((r: {role: string}) => r.role);
+
+      const backendUrl = process.env.NEXT_PUBLIC_FRAPPE_URL || "https://drown-cube-undivided.ngrok-free.dev";
+
+      // Mirror the logic in netplus/auth.py → get_home_for()
+      if (roles.includes("System Manager") || roles.includes("Administrator")) {
         router.replace("/desk");
+      } else if (roles.includes("NetPlus Operator")) {
+        window.location.href = `${backendUrl}/netplus-pwa`;
+      } else if (roles.includes("NetPlus Supervisor")) {
+        window.location.href = `${backendUrl}/netplus-supervision`;
+      } else if (roles.includes("NetPlus Client")) {
+        window.location.href = `${backendUrl}/netplus-client`;
       } else {
-        // PWA routes (/netplus-pwa, /netplus-client, /netplus-supervision, /me, /app)
-        // are served by the Frappe backend, not by Vercel — redirect to the backend URL.
-        const backendUrl = process.env.NEXT_PUBLIC_FRAPPE_URL || "http://localhost:8080";
-        const path = homePage.startsWith("/") ? homePage : `/${homePage}`;
-        window.location.href = `${backendUrl}${path}`;
+        // Fallback: desk for any other authenticated user
+        router.replace("/desk");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
