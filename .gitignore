@@ -7,3 +7,8 @@ node_modules/
 # Installer build artifacts
 installer/payload/
 installer/dist/*.exe
+
+installer/{%TEMP}/
+installer/dist/
+installer/payload/
+
