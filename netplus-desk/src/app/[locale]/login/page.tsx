@@ -209,25 +209,18 @@ export default function LoginPage() {
     try {
       await frappe.login(usr, pwd);
 
-      // After login, fetch the user's roles and apply role-based routing.
+      // Fetch the logged-in user then their roles.
       // We cannot trust Frappe's home_page field because users with the
-      // "Employee" role have desk_access=1 and Frappe returns "/desk" for them
-      // even when they are NetPlus Operators/Supervisors/Clients.
-      const sessionRes = await frappe.call({
-        method: "frappe.auth.get_logged_user",
-      });
-      const loggedUser = sessionRes.message;
+      // "Employee" role have desk_access=1 and Frappe returns "/desk" even
+      // when they are NetPlus Operators/Supervisors/Clients.
+      const loggedUser = await frappe.getLoggedUser();
 
-      const rolesRes = await frappe.call({
-        method: "frappe.client.get_list",
-        args: {
-          doctype: "Has Role",
-          filters: [["parent", "=", loggedUser]],
-          fields: ["role"],
-          limit: 50,
-        },
+      const roleRows = await frappe.list<{ role: string }>("Has Role", {
+        filters: JSON.stringify([["parent", "=", loggedUser]]),
+        fields: ["role"],
+        limit: 50,
       });
-      const roles: string[] = (rolesRes.message || []).map((r: {role: string}) => r.role);
+      const roles = roleRows.map((r) => r.role);
 
       const backendUrl = process.env.NEXT_PUBLIC_FRAPPE_URL || "https://drown-cube-undivided.ngrok-free.dev";
 
