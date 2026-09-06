@@ -25,12 +25,11 @@ try {
 
 if (-not $wslOk) {
     Write-Step "Installation de WSL2 (quelques minutes)..."
-    # --no-distribution: Docker Desktop ships its own WSL distro
     wsl --install --no-distribution
-    Write-Host "WSL2 installé. Un redémarrage peut être requis."
+    Write-Host "WSL2 installe. Un redemarrage peut etre requis."
 } else {
-    Write-Host "WSL2 déjà présent."
-    wsl --update 2>$null | Out-Null   # keep kernel current
+    Write-Host "WSL2 deja present."
+    # Note: wsl --update skipped intentionally (long download, not critical at install time)
 }
 
 # ------------------------------------------------------------
@@ -75,7 +74,7 @@ if (Test-Path $dockerExe) {
     }
 
     $tries = 0
-    while ($tries -lt 60) {
+    while ($tries -lt 24) {   # max 2 minutes (24 x 5s)
         docker info 2>$null | Out-Null
         if ($LASTEXITCODE -eq 0) { break }
         Start-Sleep -Seconds 5

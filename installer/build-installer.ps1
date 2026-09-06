@@ -115,7 +115,7 @@ if (-not $SkipPayload) {
 }
 
 # -------------------------------------------------------
-# 5. Compile installer
+# 5. Compile installer (output to temp to avoid OneDrive lock)
 # -------------------------------------------------------
 Write-Step "Compiling installer..."
 New-Item -ItemType Directory -Path $distDir -Force | Out-Null
@@ -124,21 +124,28 @@ $issContent = Get-Content $issFile -Raw -Encoding UTF8
 $issContent = $issContent -replace '#define AppVersion "[\d\.]+"', ('#define AppVersion "' + $Version + '"')
 [System.IO.File]::WriteAllText($issFile, $issContent, [System.Text.Encoding]::UTF8)
 
-& $iscc $issFile
+# Build to %TEMP%\netplus-build to avoid OneDrive file-lock on dist/
+$tempBuild = Join-Path $env:TEMP "netplus-build"
+New-Item -ItemType Directory -Path $tempBuild -Force | Out-Null
+
+# ISCC /O sets the output directory at compile time
+& $iscc "/O$tempBuild" $issFile
 if ($LASTEXITCODE -ne 0) { Write-Err "Compilation failed (exit code $LASTEXITCODE)." }
 
 # -------------------------------------------------------
-# 6. Report
+# 6. Copy from temp to dist/ and report
 # -------------------------------------------------------
-$exe = Get-ChildItem $distDir -Filter "*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-if ($exe) {
-    $sizeMB = [math]::Round($exe.Length / 1MB, 1)
+$tempExe = Get-ChildItem $tempBuild -Filter "*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+if ($tempExe) {
+    $finalExe = Join-Path $distDir $tempExe.Name
+    Copy-Item $tempExe.FullName $finalExe -Force
+    $sizeMB = [math]::Round((Get-Item $finalExe).Length / 1MB, 1)
     Write-Step "Installer ready!"
-    Write-Ok "File : $($exe.FullName)"
+    Write-Ok "File : $finalExe"
     Write-Ok "Size : ${sizeMB} MB"
     Write-Host ""
     Write-Host "  Ship this file to your customers." -ForegroundColor White
     Write-Host "  Tip: sign it with signtool to avoid SmartScreen warnings." -ForegroundColor Yellow
 } else {
-    Write-Err "No .exe found in dist/."
+    Write-Err "No .exe found in temp build dir ($tempBuild)."
 }
