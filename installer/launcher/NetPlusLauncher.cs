@@ -28,8 +28,8 @@ namespace NetPlusLauncher
             {
                 if (!createdNew)
                 {
-                    // Another instance is already running — just open the browser
-                    Process.Start(new ProcessStartInfo(Config.APP_URL) { UseShellExecute = true });
+                    // Another instance is already running — just open the app window
+                    TrayApp.OpenEdgeApp();
                     return;
                 }
 
@@ -164,7 +164,7 @@ namespace NetPlusLauncher
 
                 SetStatus("NetPlus est pret !");
                 Balloon("NetPlus est demarre ! Cliquez pour ouvrir.", ToolTipIcon.Info);
-                OpenBrowser();
+                OpenEdgeApp();
             }
             catch (Exception ex)
             {
@@ -173,7 +173,7 @@ namespace NetPlusLauncher
         }
 
         // ── Event handlers ──────────────────────────────────────
-        void OnOpen(object s, EventArgs e) { OpenBrowser(); }
+        void OnOpen(object s, EventArgs e) { OpenEdgeApp(); }
 
         void OnStop(object s, EventArgs e)
         {
@@ -357,10 +357,59 @@ namespace NetPlusLauncher
             catch { return false; }
         }
 
-        static void OpenBrowser()
+        // Open in Edge (or Chrome) app mode — no address bar, no tabs, native app look
+        internal static void OpenEdgeApp()
         {
-            try { Process.Start(new ProcessStartInfo(Config.APP_URL) { UseShellExecute = true }); }
+            string url   = Config.APP_URL;
+            string title = Config.APP_TITLE;
+
+            // Candidate browsers that support --app flag (Chromium-based)
+            string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            string[] browsers = {
+                // Microsoft Edge (pre-installed on all Windows 10/11)
+                Path.Combine(pf,   @"Microsoft\Edge\Application\msedge.exe"),
+                Path.Combine(pf86, @"Microsoft\Edge\Application\msedge.exe"),
+                Path.Combine(local,@"Microsoft\Edge\Application\msedge.exe"),
+                // Google Chrome
+                Path.Combine(pf,   @"Google\Chrome\Application\chrome.exe"),
+                Path.Combine(pf86, @"Google\Chrome\Application\chrome.exe"),
+                Path.Combine(local,@"Google\Chrome\Application\chrome.exe"),
+            };
+
+            string appArgs = "--app=" + url
+                           + " --window-size=1366,768"
+                           + " --window-position=0,0"
+                           + " --no-first-run"
+                           + " --disable-extensions"
+                           + " --disable-background-networking"
+                           + " --app-name=\"" + title + "\"";
+
+            foreach (string browser in browsers)
+            {
+                if (File.Exists(browser))
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo(browser, appArgs)
+                            { UseShellExecute = false });
+                        return; // launched successfully
+                    }
+                    catch { }
+                }
+            }
+
+            // Fallback — default browser (Chrome/Edge not found)
+            try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
             catch { }
+        }
+
+        // Keep for internal compatibility
+        internal static void OpenBrowser()
+        {
+            OpenEdgeApp();
         }
 
         void SetStatus(string msg)
