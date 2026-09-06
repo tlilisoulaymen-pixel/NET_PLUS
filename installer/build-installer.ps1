@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$Version    = "1.0.0",
     [switch]$SkipPayload
 )
@@ -54,7 +54,32 @@ if (-not $iscc) {
 Write-Ok "Inno Setup: $iscc"
 
 # -------------------------------------------------------
-# 3. Build payload/
+# 3. Build netplus-desk (Next.js) for production
+# -------------------------------------------------------
+if (-not $SkipPayload) {
+    Write-Step "Building netplus-desk (Next.js production build)..."
+    $deskDir = Join-Path $repoRoot "netplus-desk"
+
+    # Install deps if node_modules missing
+    if (-not (Test-Path (Join-Path $deskDir "node_modules"))) {
+        Write-Warn "node_modules not found — running npm install..."
+        & npm install --prefix $deskDir 2>&1 | Out-Null
+    }
+
+    # Build Next.js
+    $env:FRAPPE_URL = "http://localhost:8080"
+    & npm run build --prefix $deskDir 2>&1 | ForEach-Object {
+        if ($_ -match "error|Error") { Write-Warn $_ }
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warn "Next.js build failed — skipping .next in payload (app may not work for client)."
+    } else {
+        Write-Ok "netplus-desk built successfully (.next folder ready)"
+    }
+}
+
+# -------------------------------------------------------
+# 4. Build payload/
 # -------------------------------------------------------
 if (-not $SkipPayload) {
     Write-Step "Building payload/..."
@@ -64,7 +89,8 @@ if (-not $SkipPayload) {
         "tracking-center-addon","ngrok","INSTALL.sh",
         "start_netplus.bat","build-portal.ps1"
     )
-    $excludeDirs  = @("node_modules",".next","__pycache__",".git","dist","payload")
+    # Note: .next is intentionally kept (pre-built Next.js output for the client)
+    $excludeDirs  = @("node_modules","__pycache__",".git","dist","payload")
     $excludeFiles = @("*.pyc","*.log","*.zip",".env",".env.local")
 
     if (Test-Path $payloadDir) { Remove-Item $payloadDir -Recurse -Force }
@@ -89,7 +115,7 @@ if (-not $SkipPayload) {
 }
 
 # -------------------------------------------------------
-# 4. Compile installer
+# 5. Compile installer
 # -------------------------------------------------------
 Write-Step "Compiling installer..."
 New-Item -ItemType Directory -Path $distDir -Force | Out-Null
@@ -102,7 +128,7 @@ $issContent = $issContent -replace '#define AppVersion "[\d\.]+"', ('#define App
 if ($LASTEXITCODE -ne 0) { Write-Err "Compilation failed (exit code $LASTEXITCODE)." }
 
 # -------------------------------------------------------
-# 5. Report
+# 6. Report
 # -------------------------------------------------------
 $exe = Get-ChildItem $distDir -Filter "*.exe" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($exe) {
