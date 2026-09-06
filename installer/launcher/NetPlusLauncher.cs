@@ -135,30 +135,23 @@ namespace NetPlusLauncher
 
                 // Start netplus-desk (Next.js) silently in background
                 SetStatus("Demarrage du frontend NetPlus Desk...");
-                string deskDir = Path.Combine(ExeDir(), "netplus-desk");
-                string node    = FindNode();
-                if (node != null && Directory.Exists(deskDir))
+                string deskDir  = Path.Combine(ExeDir(), "netplus-desk");
+                string npmFull  = FindNpm();
+                if (npmFull != null && Directory.Exists(deskDir))
                 {
-                    // Use "npm run start" (production) or "npm run dev" (dev)
-                    string npmCmd = Path.Combine(Path.GetDirectoryName(node), "npm.cmd");
-                    if (!File.Exists(npmCmd))
-                        npmCmd = Path.Combine(Path.GetDirectoryName(node), "npm");
-                    if (File.Exists(npmCmd))
+                    var psi = new ProcessStartInfo(npmFull, "run start")
                     {
-                        var psi = new ProcessStartInfo(npmCmd, "run start")
-                        {
-                            WorkingDirectory       = deskDir,
-                            UseShellExecute        = false,
-                            CreateNoWindow         = true,
-                            RedirectStandardOutput = true,
-                            RedirectStandardError  = true,
-                        };
-                        Process.Start(psi); // fire and forget — runs in background
-                    }
+                        WorkingDirectory       = deskDir,
+                        UseShellExecute        = false,
+                        CreateNoWindow         = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError  = true,
+                    };
+                    Process.Start(psi); // fire and forget
                 }
 
                 SetStatus("Attente de l'application...");
-                for (int i = 0; i < 60; i++)
+                for (int i = 0; i < 30; i++)  // max 2.5 min
                 {
                     if (AppOnline(Config.HEALTH_URL)) break;
                     Thread.Sleep(5000);
@@ -217,34 +210,43 @@ namespace NetPlusLauncher
             return null;
         }
 
-        static string FindNode()
+        // Resolve npm.cmd full path — handles all Node.js install locations
+        static string FindNpm()
         {
-            string pf  = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-            string[] candidates = {
-                Path.Combine(pf,   @"nodejs\node.exe"),
-                Path.Combine(pf86, @"nodejs\node.exe"),
-                @"C:\Program Files\nodejs\node.exe",
-                "node",
+            string[] nodeDirs = {
+                Path.Combine(pf,      "nodejs"),
+                Path.Combine(pf86,    "nodejs"),
+                @"C:\Program Files\nodejs",
+                Path.Combine(appData, @"nvm\current"),
             };
-            foreach (string p in candidates)
+
+            foreach (string dir in nodeDirs)
             {
-                if (p == "node")
-                {
-                    try
-                    {
-                        using (var proc = Process.Start(new ProcessStartInfo("node", "--version")
-                            { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true }))
-                        {
-                            proc.WaitForExit(3000);
-                            if (proc.ExitCode == 0) return "node";
-                        }
-                    }
-                    catch { }
-                }
-                else if (File.Exists(p)) return p;
+                string npm = Path.Combine(dir, "npm.cmd");
+                if (File.Exists(npm)) return npm;
             }
+
+            // Fallback: resolve via where.exe (searches full PATH)
+            try
+            {
+                using (var proc = Process.Start(new ProcessStartInfo("where.exe", "npm.cmd")
+                    { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true }))
+                {
+                    string line = proc.StandardOutput.ReadLine();
+                    proc.WaitForExit(3000);
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        line = line.Trim();
+                        if (File.Exists(line)) return line;
+                    }
+                }
+            }
+            catch { }
+
             return null;
         }
 
