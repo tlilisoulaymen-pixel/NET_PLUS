@@ -11,8 +11,8 @@ namespace NetPlusLauncher
 {
     static class Config
     {
-        public const string APP_URL        = "http://localhost:8080/portal";  // netplus-erp Vite app
-        public const string HEALTH_URL     = "http://localhost:8080";         // no-auth health check
+        public const string APP_URL        = "http://localhost:3000/login"; // netplus-desk Next.js login
+        public const string HEALTH_URL     = "http://localhost:3000";       // health check
         public const string APP_TITLE      = "NetPlus";
         public const string COMPOSE_DIR    = "frappe_docker";
     }
@@ -119,7 +119,31 @@ namespace NetPlusLauncher
 
                 SetStatus("Demarrage des services NetPlus...");
                 string composeDir = Path.Combine(ExeDir(), Config.COMPOSE_DIR);
-                RunSilent(dockerCli, "compose up -d", composeDir);
+                RunSilent(dockerCli, "compose -f pwd.yml -f compose.netplus.yaml up -d", composeDir);
+
+                // Start netplus-desk (Next.js) silently in background
+                SetStatus("Demarrage du frontend NetPlus Desk...");
+                string deskDir = Path.Combine(ExeDir(), "netplus-desk");
+                string node    = FindNode();
+                if (node != null && Directory.Exists(deskDir))
+                {
+                    // Use "npm run start" (production) or "npm run dev" (dev)
+                    string npmCmd = Path.Combine(Path.GetDirectoryName(node), "npm.cmd");
+                    if (!File.Exists(npmCmd))
+                        npmCmd = Path.Combine(Path.GetDirectoryName(node), "npm");
+                    if (File.Exists(npmCmd))
+                    {
+                        var psi = new ProcessStartInfo(npmCmd, "run start")
+                        {
+                            WorkingDirectory       = deskDir,
+                            UseShellExecute        = false,
+                            CreateNoWindow         = true,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError  = true,
+                        };
+                        Process.Start(psi); // fire and forget — runs in background
+                    }
+                }
 
                 SetStatus("Attente de l'application...");
                 for (int i = 0; i < 60; i++)
@@ -178,6 +202,37 @@ namespace NetPlusLauncher
             };
             foreach (string p in candidates)
                 if (File.Exists(p)) return p;
+            return null;
+        }
+
+        static string FindNode()
+        {
+            string pf  = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+            string[] candidates = {
+                Path.Combine(pf,   @"nodejs\node.exe"),
+                Path.Combine(pf86, @"nodejs\node.exe"),
+                @"C:\Program Files\nodejs\node.exe",
+                "node",
+            };
+            foreach (string p in candidates)
+            {
+                if (p == "node")
+                {
+                    try
+                    {
+                        using (var proc = Process.Start(new ProcessStartInfo("node", "--version")
+                            { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true }))
+                        {
+                            proc.WaitForExit(3000);
+                            if (proc.ExitCode == 0) return "node";
+                        }
+                    }
+                    catch { }
+                }
+                else if (File.Exists(p)) return p;
+            }
             return null;
         }
 
