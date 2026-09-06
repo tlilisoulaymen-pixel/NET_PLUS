@@ -32,7 +32,7 @@ PrivilegesRequired=admin
 ArchitecturesInstallIn64BitMode=x64
 MinVersion=10.0.17763
 ; Optional branding — put the files next to this script and uncomment:
-; SetupIconFile=netplus.ico
+SetupIconFile=netplus.ico
 ; WizardImageFile=wizard-banner.bmp        (164x314 px)
 ; WizardSmallImageFile=wizard-small.bmp    (55x58 px)
 
@@ -53,18 +53,17 @@ Source: "install-prerequisites.ps1"; DestDir: "{app}\installer"; Flags: ignoreve
 
 ; Silent launcher executable (compiled C# WinForms tray app — no console window)
 Source: "launcher\NetPlusLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
-; Source: "netplus.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "netplus.ico";                  DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 ; Desktop shortcut
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
-; IconFilename: "{app}\netplus.ico"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\netplus.ico"; Tasks: desktopicon
 
 ; Start menu shortcut
-Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"
+Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\netplus.ico"
 
 ; Startup (optional task)
-Name: "{userstartup}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; Tasks: autostart
+Name: "{userstartup}\{#AppName}"; Filename: "{app}\{#AppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\netplus.ico"; Tasks: autostart
 
 [Run]
 ; Step 1 — install prerequisites (WSL2 + Docker Desktop) with live status

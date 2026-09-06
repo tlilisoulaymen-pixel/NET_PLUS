@@ -9,7 +9,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Net Plus Desk", template: "%s · Net Plus Desk" },
   description: "Modern ERP workspace powered by Frappe / ERPNext",
-  icons: { icon: "/favicon.ico" },
+  icons: {
+    icon:             "/favicon.ico",
+    shortcut:         "/favicon.ico",
+    apple:            "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1 };

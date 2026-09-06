@@ -51,9 +51,21 @@ namespace NetPlusLauncher
                 new MenuItem("Quitter",         OnQuit),
             });
 
+            // Load custom icon (embedded in exe via /win32icon, also on disk as fallback)
+            System.Drawing.Icon appIcon = null;
+            try
+            {
+                string icoPath = Path.Combine(ExeDir(), "netplus.ico");
+                if (File.Exists(icoPath))
+                    appIcon = new System.Drawing.Icon(icoPath);
+            }
+            catch { }
+            if (appIcon == null)
+                appIcon = System.Drawing.SystemIcons.Application;
+
             _tray = new NotifyIcon
             {
-                Icon        = System.Drawing.SystemIcons.Application,
+                Icon        = appIcon,
                 Text        = "NetPlus - Demarrage...",
                 ContextMenu = _menu,
                 Visible     = true,
