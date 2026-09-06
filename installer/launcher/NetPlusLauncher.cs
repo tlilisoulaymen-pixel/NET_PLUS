@@ -11,8 +11,8 @@ namespace NetPlusLauncher
 {
     static class Config
     {
-        public const string APP_URL        = "http://localhost:8080/app";  // ERPNext login page
-        public const string HEALTH_URL     = "http://localhost:8080";      // no-auth health check
+        public const string APP_URL        = "http://localhost:8080/netplus-login"; // NetPlus custom login
+        public const string HEALTH_URL     = "http://localhost:8080";               // no-auth health check
         public const string APP_TITLE      = "NetPlus";
         public const string COMPOSE_DIR    = "frappe_docker";
     }
