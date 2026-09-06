@@ -133,20 +133,25 @@ namespace NetPlusLauncher
                 string composeDir = Path.Combine(ExeDir(), Config.COMPOSE_DIR);
                 RunSilent(dockerCli, "compose -f pwd.yml -f compose.netplus.yaml up -d", composeDir);
 
-                // Start netplus-desk (Next.js) silently in background
+                // Start netplus-desk (Next.js standalone) silently in background
                 SetStatus("Demarrage du frontend NetPlus Desk...");
-                string deskDir  = Path.Combine(ExeDir(), "netplus-desk");
-                string npmFull  = FindNpm();
-                if (npmFull != null && Directory.Exists(deskDir))
+                string deskDir        = Path.Combine(ExeDir(), "netplus-desk");
+                string standaloneJs   = Path.Combine(deskDir, @".next\standalone\server.js");
+                string nodeExe        = FindNodeExe();
+
+                if (nodeExe != null && File.Exists(standaloneJs))
                 {
-                    var psi = new ProcessStartInfo(npmFull, "run start")
+                    var psi = new ProcessStartInfo(nodeExe, "\"" + standaloneJs + "\"")
                     {
-                        WorkingDirectory       = deskDir,
+                        WorkingDirectory       = Path.Combine(deskDir, @".next\standalone"),
                         UseShellExecute        = false,
                         CreateNoWindow         = true,
                         RedirectStandardOutput = true,
                         RedirectStandardError  = true,
                     };
+                    psi.EnvironmentVariables["PORT"]      = "3000";
+                    psi.EnvironmentVariables["HOSTNAME"]  = "localhost";
+                    psi.EnvironmentVariables["FRAPPE_URL"]= "http://localhost:8080";
                     Process.Start(psi); // fire and forget
                 }
 
@@ -210,7 +215,40 @@ namespace NetPlusLauncher
             return null;
         }
 
-        // Resolve npm.cmd full path — handles all Node.js install locations
+        // Find node.exe full path — needed to run standalone Next.js server.js
+        static string FindNodeExe()
+        {
+            string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string pf86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+            string[] candidates = {
+                Path.Combine(pf,   @"nodejs\node.exe"),
+                Path.Combine(pf86, @"nodejs\node.exe"),
+                @"C:\Program Files\nodejs\node.exe",
+            };
+            foreach (string p in candidates)
+                if (File.Exists(p)) return p;
+
+            // Fallback: resolve via where.exe
+            try
+            {
+                using (var proc = Process.Start(new ProcessStartInfo("where.exe", "node.exe")
+                    { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true }))
+                {
+                    string line = proc.StandardOutput.ReadLine();
+                    proc.WaitForExit(3000);
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        line = line.Trim();
+                        if (File.Exists(line)) return line;
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        // Keep FindNpm for potential fallback use
         static string FindNpm()
         {
             string pf   = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);

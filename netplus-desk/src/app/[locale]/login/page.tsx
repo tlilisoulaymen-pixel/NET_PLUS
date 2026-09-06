@@ -70,7 +70,7 @@ const blurClassMap: Record<BlurSize, string> = {
   "3xl": "backdrop-blur-3xl",
 };
 
-export function SmokeyBackground({
+function SmokeyBackground({
   backdropBlurAmount = "sm",
   color = "#1E40AF", // Default dark blue
   className = "",

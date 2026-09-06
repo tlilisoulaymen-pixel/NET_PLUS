@@ -66,15 +66,24 @@ if (-not $SkipPayload) {
         & npm install --prefix $deskDir 2>&1 | Out-Null
     }
 
-    # Build Next.js
-    $env:FRAPPE_URL = "http://localhost:8080"
+    # Build Next.js in standalone mode
+    $env:FRAPPE_URL          = "http://localhost:8080"
+    $env:NEXT_TELEMETRY_DISABLED = "1"
     & npm run build --prefix $deskDir 2>&1 | ForEach-Object {
         if ($_ -match "error|Error") { Write-Warn $_ }
     }
     if ($LASTEXITCODE -ne 0) {
-        Write-Warn "Next.js build failed — skipping .next in payload (app may not work for client)."
+        Write-Warn "Next.js build failed - standalone server will not be available."
     } else {
-        Write-Ok "netplus-desk built successfully (.next folder ready)"
+        # Standalone mode requires public/ and .next/static/ to be copied manually
+        $standalone = Join-Path $deskDir ".next\standalone"
+        if (Test-Path $standalone) {
+            robocopy (Join-Path $deskDir "public")        (Join-Path $standalone "public")          /E /NFL /NDL /NJH /NJS /NP | Out-Null
+            robocopy (Join-Path $deskDir ".next\static")  (Join-Path $standalone ".next\static")    /E /NFL /NDL /NJH /NJS /NP | Out-Null
+            Write-Ok "netplus-desk standalone ready (.next/standalone/server.js)"
+        } else {
+            Write-Warn "Standalone folder not found - check next.config.mjs has output:'standalone'"
+        }
     }
 }
 
