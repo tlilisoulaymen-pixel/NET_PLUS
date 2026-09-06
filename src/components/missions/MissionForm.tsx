@@ -51,7 +51,7 @@ function MiniMap({ lat, lng, onChange }: { lat: string, lng: string, onChange: (
     const cbName = "initGoogleMaps" + Date.now();
     (window as any)[cbName] = () => setLoaded(true);
     const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=places,marker&callback=${cbName}`;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDBVwEYtvHGnuKdmaKEfEo-OgaIC6RflnQ&libraries=marker&callback=${cbName}`;
     document.head.appendChild(s);
   }, []);
 
@@ -79,17 +79,26 @@ function MiniMap({ lat, lng, onChange }: { lat: string, lng: string, onChange: (
         onChange(String(pos.lat.toFixed(6)), String(pos.lng.toFixed(6)));
       });
 
-      if (searchInputRef.current && google.maps.places) {
-        autocompleteRef.current = new google.maps.places.Autocomplete(searchInputRef.current);
-        autocompleteRef.current.bindTo("bounds", mapObjRef.current);
-        autocompleteRef.current.addListener("place_changed", () => {
-          const place = autocompleteRef.current.getPlace();
-          if (!place.geometry || !place.geometry.location) return;
-          const pos = place.geometry.location;
-          mapObjRef.current.setCenter(pos);
-          mapObjRef.current.setZoom(17);
-          markerRef.current.setPosition(pos);
-          onChange(String(pos.lat().toFixed(6)), String(pos.lng().toFixed(6)));
+      if (searchInputRef.current) {
+        const geocoder = new google.maps.Geocoder();
+        searchInputRef.current.addEventListener("keydown", (e: any) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const address = searchInputRef.current?.value;
+            if (address) {
+              geocoder.geocode({ address }, (results: any, status: any) => {
+                if (status === "OK" && results && results[0]) {
+                  const pos = results[0].geometry.location;
+                  mapObjRef.current.setCenter(pos);
+                  mapObjRef.current.setZoom(17);
+                  markerRef.current.setPosition(pos);
+                  onChange(String(pos.lat().toFixed(6)), String(pos.lng().toFixed(6)));
+                } else {
+                  toast.error("Adresse introuvable");
+                }
+              });
+            }
+          }
         });
       }
     } else {
@@ -104,7 +113,7 @@ function MiniMap({ lat, lng, onChange }: { lat: string, lng: string, onChange: (
       <input 
         ref={searchInputRef}
         type="text" 
-        placeholder="Rechercher un lieu..." 
+        placeholder="Rechercher (Appuyez sur Entrée)..." 
         className="absolute top-3 left-3 z-10 w-64 rounded-md border-0 shadow bg-white px-3 py-2 text-sm text-black focus:ring-2 focus:ring-brand-500"
       />
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
