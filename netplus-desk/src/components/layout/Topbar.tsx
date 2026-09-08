@@ -26,8 +26,12 @@ export function Topbar() {
   const userDoc = userDocQuery.data;
   const username = userDoc?.name || "User";
   const fullName = userDoc?.full_name || username;
-  const userImage = userDoc?.user_image;
+  const rawImage = userDoc?.user_image as string | undefined;
+  // Frappe user_image: "/files/..." or "/private/files/..." — both proxied by Next.js rewrites.
+  // Use as-is (they resolve on Vercel). Undefined/empty → show initials fallback.
+  const userImage = rawImage && rawImage.trim() !== "" ? rawImage : undefined;
   const initials = (userDoc?.first_name || userDoc?.email || "?").slice(0, 2).toUpperCase();
+
 
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);

@@ -11,6 +11,18 @@ export class FrappeError extends Error {
     public payload?: unknown,
   ) {
     super(message);
+    this.name = "FrappeError";
+  }
+}
+
+/**
+ * Thrown when the backend is completely unreachable (network error, Docker down)
+ * or when the server returns HTML instead of JSON (502/503/etc).
+ */
+export class BackendOfflineError extends Error {
+  constructor(message = "Le serveur NetPlus est en cours de démarrage. Veuillez patienter...") {
+    super(message);
+    this.name = "BackendOfflineError";
   }
 }
 
@@ -20,16 +32,28 @@ function parsed(text: string): unknown {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
-    ...init,
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+      ...init,
+    });
+  } catch {
+    // Network-level failure — Docker/backend is not running
+    throw new BackendOfflineError();
+  }
+
   if (res.status === 401 || res.status === 403) {
     throw new FrappeError("Not authorized", res.status, await res.text().catch(() => null));
   }
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
+    // If we got an HTML page (502 Bad Gateway, Nginx error, etc.) — backend is offline
+    if (text.trimStart().startsWith("<")) {
+      throw new BackendOfflineError();
+    }
     let message = `Frappe error ${res.status}`;
     try {
       const p = parsed(text) as { message?: string; exception?: string };
@@ -37,6 +61,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch { /* keep default */ }
     throw new FrappeError(message, res.status, parsed(text));
   }
+
+  // Check content-type before parsing as JSON
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("json")) {
+    const text = await res.text().catch(() => "");
+    if (text.trimStart().startsWith("<")) {
+      throw new BackendOfflineError();
+    }
+    throw new FrappeError("Unexpected non-JSON response", res.status, text);
+  }
+
   return res.json() as Promise<T>;
 }
 

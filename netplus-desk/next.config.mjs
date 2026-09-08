@@ -25,10 +25,14 @@ const nextConfig = {
       { source: "/api/:path*", destination: `${FRAPPE_URL}/api/:path*` },
       { source: "/assets/:path*", destination: `${FRAPPE_URL}/assets/:path*` },
       { source: "/files/:path*", destination: `${FRAPPE_URL}/files/:path*` },
+      { source: "/private/files/:path*", destination: `${FRAPPE_URL}/private/files/:path*` },
       // Proxy Frappe PWA routes
       { source: "/netplus-client", destination: `${FRAPPE_URL}/netplus-client` },
+      { source: "/netplus-client/:path*", destination: `${FRAPPE_URL}/netplus-client/:path*` },
       { source: "/netplus-pwa", destination: `${FRAPPE_URL}/netplus-pwa` },
+      { source: "/netplus-pwa/:path*", destination: `${FRAPPE_URL}/netplus-pwa/:path*` },
       { source: "/netplus-supervision", destination: `${FRAPPE_URL}/netplus-supervision` },
+      { source: "/netplus-supervision/:path*", destination: `${FRAPPE_URL}/netplus-supervision/:path*` },
     ];
   },
 };
