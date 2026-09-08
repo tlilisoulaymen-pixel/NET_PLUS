@@ -7,14 +7,13 @@ import { frappe } from "@/lib/frappe/client";
 import { useLoggedUserDoc } from "@/lib/frappe/hooks";
 import { useTheme, ACCENT_COLORS, type Theme } from "@/lib/theme";
 import {
-  Search, Plus, Bell, Sparkles, Sun, Moon, Monitor,
+  Bell, Sparkles, Sun, Moon, Monitor,
   LogOut, ChevronDown, Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-
 import { ActionSearchBar } from "@/components/ui/action-search-bar";
+import { CopilotPanel } from "@/components/copilot/CopilotPanel";
 
 // ── Topbar ───────────────────────────────────────────────────────────────────
 export function Topbar() {
@@ -36,6 +35,7 @@ export function Topbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+  const [showCopilot, setShowCopilot] = useState(false);
 
   const userRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
@@ -77,6 +77,7 @@ export function Topbar() {
   ];
 
   return (
+    <>
     <header
       className="fixed left-[var(--sidebar-width)] right-0 top-0 z-30 flex h-[var(--topbar-height)] items-center gap-3 border-b px-4 sm:px-6"
       style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--line)" }}
@@ -102,17 +103,21 @@ export function Topbar() {
           )}
         </div>
 
-        {/* Ask AI (Static) */}
+        {/* Ask AI → opens Copilot panel */}
         <button
-          className="flex h-9 items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-medium transition-all hover:bg-[var(--bg-muted)]"
+          onClick={() => setShowCopilot(true)}
+          className="flex h-9 items-center gap-1.5 rounded-[10px] border px-3 text-[13px] font-medium transition-all hover:shadow-md"
           style={{
-            backgroundColor: "var(--bg-surface)",
-            borderColor: "var(--line)",
-            color: "var(--ink-primary)"
+            background: showCopilot
+              ? "linear-gradient(135deg, var(--accent), #7c3aed)"
+              : "var(--bg-surface)",
+            borderColor: showCopilot ? "transparent" : "var(--line)",
+            color: showCopilot ? "#fff" : "var(--ink-primary)",
+            boxShadow: showCopilot ? "0 0 14px color-mix(in srgb, var(--accent) 45%, transparent)" : undefined,
           }}
-          title="Ask AI (Coming Soon)"
+          title="Assistant NetPlus"
         >
-          <Sparkles className="size-4" style={{ color: "var(--accent)" }} />
+          <Sparkles className="size-4" style={{ color: showCopilot ? "#fff" : "var(--accent)" }} />
           Ask AI
         </button>
 
@@ -214,6 +219,10 @@ export function Topbar() {
         </div>
       </div>
     </header>
+
+    {/* Copilot right panel */}
+    <CopilotPanel open={showCopilot} onClose={() => setShowCopilot(false)} />
+    </>
   );
 }
 
